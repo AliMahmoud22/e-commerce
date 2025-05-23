@@ -1,26 +1,27 @@
 // src/components/Header.jsx
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../assets/logo.png';
 import { UserContext } from '../context/UserContext';
 import { useContext } from 'react';
-
+import Alert from './Alert';
 export default function Header({
   searchTerm,
   handleSearch,
   sortOrder,
   handleSort,
   handleCategorySelect,
-  handleContactClick,
   handleShowDeals,
   currentView,
   handleShowHome,
 }) {
+  
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('success'); // or 'error'
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [signInData, setSignInData] = useState({ email: '', password: '' });
   const [signUpData, setSignUpData] = useState({
     username: '',
@@ -29,17 +30,6 @@ export default function Header({
     passwordConfirm: '',
   });
   const { user, setUser } = useContext(UserContext);
-  const alertTimeout = useRef();
-
-  //timeout for alert
-  useEffect(() => {
-    if (alertMessage) {
-      alertTimeout.current = setTimeout(() => {
-        setAlertMessage('');
-      }, 3000); // 3000ms = 3 seconds
-    }
-    return () => clearTimeout(alertTimeout.current);
-  }, [alertMessage]);
 
   // geting user data if logged in
   useEffect(() => {
@@ -131,55 +121,24 @@ export default function Header({
     }
   };
 
+  const handleContactClick = () => {
+    setShowContactModal(true);
+  };
+
+  const closeContactModal = () => {
+    setShowContactModal(false);
+  };
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
   return (
     <>
       {/* Alert */}
-      {console.log(user)}
-      {alertMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-md px-4">
-          <div
-            className={`flex items-center gap-3 rounded-lg shadow-lg px-4 py-3 ${
-              alertType === 'success'
-                ? 'bg-blue-100 border text-center border-primary text-primary'
-                : 'bg-red-100 border text-center border-red-400 text-red-700'
-            }`}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {alertType === 'success' ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              )}
-            </svg>
-            <span className="flex-1">{alertMessage}</span>
-            <button
-              onClick={() => setAlertMessage('')}
-              className="text-xl font-bold text-gray-400 hover:text-gray-600 focus:outline-none"
-              aria-label="Close"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-      )}
+      <Alert
+        message={alertMessage}
+        type={alertType}
+        onClose={() => setAlertMessage('')}
+      />
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -200,81 +159,83 @@ export default function Header({
                 </button>
 
                 {isHomePage && (
-                  <div className="dropdown relative inline-block">
-                    <button className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                      Categories
-                      <svg
-                        className="ml-1 w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        ></path>
-                      </svg>
-                    </button>
-                    <div className="dropdown-menu absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1">
-                      <button
-                        onClick={() => handleCategorySelect('fashion')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Fashion
+                  <>
+                    <div className="dropdown relative inline-block">
+                      <button className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                        Categories
+                        <svg
+                          className="ml-1 w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          ></path>
+                        </svg>
                       </button>
-                      <button
-                        onClick={() => handleCategorySelect('sports')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Sports
-                      </button>
-                      <button
-                        onClick={() => handleCategorySelect('electronics')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Electronics
-                      </button>
-                      <button
-                        onClick={() => handleCategorySelect('other')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Other
-                      </button>
-                      <button
-                        onClick={() => handleCategorySelect('beauty')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Beauty
-                      </button>
-                      <button
-                        onClick={() => handleCategorySelect('home')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Home
-                      </button>
-                      <button
-                        onClick={() => handleCategorySelect('books')}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                      >
-                        Books
-                      </button>
+                      <div className="dropdown-menu absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1">
+                        <button
+                          onClick={() => handleCategorySelect('fashion')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Fashion
+                        </button>
+                        <button
+                          onClick={() => handleCategorySelect('sports')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Sports
+                        </button>
+                        <button
+                          onClick={() => handleCategorySelect('electronics')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Electronics
+                        </button>
+                        <button
+                          onClick={() => handleCategorySelect('other')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Other
+                        </button>
+                        <button
+                          onClick={() => handleCategorySelect('beauty')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Beauty
+                        </button>
+                        <button
+                          onClick={() => handleCategorySelect('home')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Home
+                        </button>
+                        <button
+                          onClick={() => handleCategorySelect('books')}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                        >
+                          Books
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                    <button
+                      className={`${
+                        currentView === 'featured'
+                          ? 'border-b-2 border-primary text-gray-900'
+                          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                      onClick={handleShowDeals}
+                    >
+                      Deals
+                    </button>
+                  </>
                 )}
 
-                <button
-                  className={`${
-                    currentView === 'featured'
-                      ? 'border-b-2 border-primary text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
-                  onClick={handleShowDeals}
-                >
-                  Deals
-                </button>
                 <button
                   onClick={handleContactClick}
                   className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
@@ -560,6 +521,185 @@ export default function Header({
                   Sign Up
                 </button>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {showContactModal && (
+        <div className="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+            onClick={closeContactModal}
+          ></div>
+          <div className="relative bg-white rounded-lg max-w-md w-full mx-4 modal-content">
+            <div className="absolute top-0 right-0 pt-4 pr-4">
+              <button
+                type="button"
+                className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
+                onClick={closeContactModal}
+              >
+                <span className="sr-only">Close</span>
+                <svg
+                  className="h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary bg-opacity-10 mb-4">
+                  <svg
+                    className="h-6 w-6 text-primary"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Contact Us
+                </h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  We're here to help! Reach out to us using the information
+                  below.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-6 w-6 text-primary"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <p className="font-medium text-gray-900">Email</p>
+                    <p className="text-gray-500">support@Aliest.com</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-6 w-6 text-primary"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <p className="font-medium text-gray-900">Phone</p>
+                    <p className="text-gray-500">+1 (555) 123-4567</p>
+                    <p className="text-gray-500 text-xs mt-1">
+                      Monday-Friday, 9am-5pm EST
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-6 w-6 text-primary"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <p className="font-medium text-gray-900">Address</p>
+                    <p className="text-gray-500">123 Commerce St, Suite 100</p>
+                    <p className="text-gray-500">Tech City, TC 12345</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="rounded-md bg-blue-50 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg
+                        className="h-5 w-5 text-blue-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3 flex-1 md:flex md:justify-between">
+                      <p className="text-sm text-blue-700">
+                        For fastest response, please include your order number
+                        when contacting us.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:text-sm"
+                  onClick={closeContactModal}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

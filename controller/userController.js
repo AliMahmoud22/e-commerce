@@ -59,11 +59,11 @@ export const uploadUserPhotoToCloudinary = catchAsync(
       uploadStream.end(req.file.buffer);
     });
 
-    let doc;
+    let user;
     // Save the Cloudinary URL to logged in user
     if (!adminUpdateUserPhoto) {
       req.user.photo = result.secure_url;
-      doc = await User.findByIdAndUpdate(
+      user = await User.findByIdAndUpdate(
         req.user.id,
         {
           photo: result.secure_url,
@@ -73,7 +73,7 @@ export const uploadUserPhotoToCloudinary = catchAsync(
     }
     // Save the Cloudinary URL to updated user by admin
     else {
-      doc = await User.findByIdAndUpdate(
+      user = await User.findByIdAndUpdate(
         req.params.id,
         {
           photo: result.secure_url,
@@ -81,12 +81,12 @@ export const uploadUserPhotoToCloudinary = catchAsync(
         { new: true },
       );
     }
-    if (!doc)
+    if (!user)
       return next(new AppError('Error happened while updating the DB', 500));
 
     res
       .status(200)
-      .json({ status: 'success', message: 'photo uploaded.', doc });
+      .json({ status: 'success', message: 'photo uploaded.', user });
   },
 );
 
