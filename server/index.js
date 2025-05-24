@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: './config.env' });
+
+import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import express from 'express';
 import morgan from 'morgan';
 import { fileURLToPath } from 'url';
@@ -9,11 +14,8 @@ import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import validator from 'validator';
-
-dotenv.config({ path: './config.env' });
-
+import connectToDatabase from './utils/database.js';
 import globalErrorHandle from './controller/globalErrorHandler.js';
 import AppError from './utils/AppError.js';
 import userRoute from './Routes/usersRoutes.js';
@@ -21,10 +23,47 @@ import productRoute from './Routes/productRoutes.js';
 import cartRoute from './Routes/cartRoutes.js';
 import orderRoute from './Routes/orderRoutes.js';
 import reviewRoute from './Routes/reviewRoutes.js';
-
 import * as orderController from './controller/orderController.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception! 💥 Shutting down...');
+  console.error(err);
+  process.exit(1);
+});
+
+// Cloudinary Config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const port = process.env.PORT || 4000;
+
+//connecting to DB and initalize server
+(async () => {
+  try {
+    await connectToDatabase();
+    console.log('🌐 MongoDB connected.');
+
+    const server = app.listen(port, () => {
+      console.log(`🚀 Server running on port ${port}`);
+    });
+
+    process.on('unhandledRejection', async (err) => {
+      console.error('Unhandled Rejection! 💥');
+      console.error(err);
+      await mongoose.connection.close();
+      server.close(() => process.exit(1));
+    });
+  } catch (err) {
+    console.error('❌ Failed to start server:', err);
+    process.exit(1);
+  }
+})();
 
 const app = express();
 
@@ -45,9 +84,10 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: [
+      'https://e-commerce-gamma-olive-66.vercel.app', // Added as a string
+      'https://e-commerce-git-main-ali-mahmouds-projects-d99978cf.vercel.app/',
+      'https://e-commerce-my8yrsj8y-ali-mahmouds-projects-d99978cf.vercel.app/',
       /^https:\/\/e-commerce-gamma-olive-66\.vercel\.app/,
-
-      // 'http://localhost:5173', //  frontend
       /^https:\/\/checkout\.stripe\.com$/, // stripe
       /^https:\/\/res\.cloudinary\.com$/, // cloudinary
     ],
