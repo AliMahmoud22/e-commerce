@@ -1,14 +1,9 @@
 import nodemailer from 'nodemailer';
-import pug from 'pug';
+
 import { convert } from 'html-to-text';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default class Email {
   constructor(user, url) {
-    console.log(user.email, user.name.split(' ')[0]);
     this.url = url;
     this.to = user.email;
     this.firstName = user.name.split(' ')[0];
@@ -548,7 +543,6 @@ table, td { color: #000000; } </style>
 
 </html>
 `;
-    console.log(html, this.to);
     const emailOptions = {
       from: this.from,
       to: this.to,
