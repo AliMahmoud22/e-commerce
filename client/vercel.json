@@ -1,12 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/"
+      "source": "/api/(.*)",
+      "destination": "https://e-commerce-e15c.vercel.app/api/$1"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "../server/server.js"
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
