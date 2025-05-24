@@ -18,13 +18,15 @@ export default function ProductPage() {
       try {
         setIsLoading(true);
         console.log(slug);
-        const res = await axios.get(`/api/products/${slug}`);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/products/${slug}`
+        );
         setProduct(res.data.document);
         setReviews(res.data.document.reviews || []);
       } catch (error) {
         console.log(`error happpened ${error}`);
         setAlertMessage(
-          error.response?.data?.message || 'Something went wrong.',
+          error.response?.data?.message || 'Something went wrong.'
         );
         setAlertType('error');
       }
@@ -39,7 +41,10 @@ export default function ProductPage() {
   const handleAddToCart = async () => {
     setIsLoading(true);
     try {
-      await axios.post('/api/cart/', { quantity, product: product.id });
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/cart/`, {
+        quantity,
+        product: product.id,
+      });
       setAlertMessage(`Added to Cart`);
       setAlertType('success');
     } catch (error) {
@@ -99,7 +104,7 @@ export default function ProductPage() {
                             }`}
                             onClick={() => handleImageClick(img)}
                           />
-                        ),
+                        )
                     )}
                 </div>
               </div>

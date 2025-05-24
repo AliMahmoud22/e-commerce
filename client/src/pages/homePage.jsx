@@ -15,7 +15,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      let url = '/api/products';
+      let url = `${import.meta.env.VITE_BACKEND_URL}/api/products`;
       const params = [];
       if (activeCategory) params.push(`category=${activeCategory}`);
       if (sort !== '') params.push(`sort=${sort}`);
@@ -44,7 +44,6 @@ export default function HomePage() {
   };
 
   const navigateToProductDetails = (productSlug) => {
- 
     navigate(`/product/${productSlug}`);
   };
 
@@ -72,7 +71,9 @@ export default function HomePage() {
   const getViewTitle = () => {
     if (currentView === 'featured') return 'Deals & Featured Products';
     if (currentView === 'category')
-      return `${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Products`;
+      return `${
+        activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)
+      } Products`;
     return 'All Products';
   };
 

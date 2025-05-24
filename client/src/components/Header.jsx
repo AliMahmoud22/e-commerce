@@ -34,7 +34,7 @@ export default function Header({
   useEffect(() => {
     (async () => {
       await axios
-        .get('https://e-commerce-e15c.vercel.app/api/users/me', {
+        .get(`${import.meta.env.VITE_BACKEND_URL}/api/users/me`, {
           withCredentials: true,
         })
         .then((res) => setUser(res.data.document))
@@ -58,7 +58,9 @@ export default function Header({
   // Sign out handler
   const handleSignOut = async () => {
     setUser(null);
-    await axios.post('https://e-commerce-e15c.vercel.app/api/users/logout', { withCredentials: true });
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/users/logout`, {
+      withCredentials: true,
+    });
     setAlertMessage('Signed out successfully');
     setAlertType('success');
   };
@@ -91,9 +93,13 @@ export default function Header({
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://e-commerce-e15c.vercel.app/api/users/login', signInData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/login`,
+        signInData,
+        {
+          withCredentials: true,
+        }
+      );
       setAlertMessage(response.data.message);
       setAlertType('success');
       setUser(response.data.user);
@@ -107,9 +113,13 @@ export default function Header({
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://e-commerce-e15c.vercel.app/api/users/signup', signUpData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/signup`,
+        signUpData,
+        {
+          withCredentials: true,
+        }
+      );
 
       setAlertMessage(response.data.message);
       setAlertType('success');
@@ -136,9 +146,9 @@ export default function Header({
     }
     try {
       await axios.post(
-        '/api/users/forgotPassword',
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/forgotPassword`,
         { email: signInData.email },
-        { withCredentials: true },
+        { withCredentials: true }
       );
       setAlertMessage('Password reset email sent!');
       setAlertType('success');

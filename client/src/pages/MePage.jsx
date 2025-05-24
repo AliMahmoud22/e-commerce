@@ -51,14 +51,18 @@ export default function MePage() {
       if (form.username) data.name = form.username;
       if (form.email) data.email = form.email;
       console.log(data);
-      const res = await axios.patch('/api/users/me', data, {
-        withCredentials: true,
-      });
+      const res = await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/me`,
+        data,
+        {
+          withCredentials: true,
+        }
+      );
       setUser(res.data.user);
       setAlertMessage('Profile updated!');
       setAlertType('success');
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setAlertMessage(err.response?.data?.message || 'Update failed');
       setAlertType('error');
     }
@@ -74,12 +78,14 @@ export default function MePage() {
       formData.append('photo', photo);
       console.log(user.id);
       const res = await axios.patch(
-        `/api/users/upload-photo/${user._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/upload-photo/${
+          user._id
+        }`,
         formData,
         {
           withCredentials: true,
           headers: { 'Content-Type': 'multipart/form-data' },
-        },
+        }
       );
       setUser(res.data.user);
       setAlertMessage('Photo updated!');
@@ -100,13 +106,13 @@ export default function MePage() {
     setPasswordLoading(true);
     try {
       await axios.patch(
-        '/api/users/updatePassword',
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/updatePassword`,
         {
           password: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
           newPasswordConfirm: passwordData.passwordConfirm,
         },
-        { withCredentials: true },
+        { withCredentials: true }
       );
       setAlertMessage('Password updated!');
       setAlertType('success');

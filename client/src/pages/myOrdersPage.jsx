@@ -13,12 +13,14 @@ export default function MyOrdersPage() {
     const fetchOrders = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get('/api/orders/my-orders');
-        console.log(res)
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/orders/my-orders`
+        );
+        console.log(res);
         setOrders(res.data.orders || []);
       } catch (error) {
         setAlertMessage(
-          error.response?.data?.message || 'Failed to load orders.',
+          error.response?.data?.message || 'Failed to load orders.'
         );
         setAlertType('error');
       }

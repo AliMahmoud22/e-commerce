@@ -27,10 +27,15 @@ export default function ResetPasswordPage() {
     }
     setLoading(true);
     try {
-      await axios.patch(`/api/users/resetPassword/${resetToken}`, {
-        password,
-        passwordConfirm,
-      });
+      await axios.patch(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/users/resetPassword/${resetToken}`,
+        {
+          password,
+          passwordConfirm,
+        }
+      );
       setAlertMessage('Password reset successful! Redirecting to login...');
       setAlertType('success');
       setTimeout(() => navigate('/'), 2000);
