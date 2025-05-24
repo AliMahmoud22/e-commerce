@@ -34,7 +34,7 @@ export default function Header({
   useEffect(() => {
     (async () => {
       await axios
-        .get('/api/users/me', {
+        .get('https://e-commerce-e15c.vercel.app/api/users/me', {
           withCredentials: true,
         })
         .then((res) => setUser(res.data.document))
@@ -58,7 +58,7 @@ export default function Header({
   // Sign out handler
   const handleSignOut = async () => {
     setUser(null);
-    await axios.post('/api/users/logout', { withCredentials: true });
+    await axios.post('https://e-commerce-e15c.vercel.app/api/users/logout', { withCredentials: true });
     setAlertMessage('Signed out successfully');
     setAlertType('success');
   };
@@ -91,7 +91,7 @@ export default function Header({
   const handleSignInSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/users/login', signInData, {
+      const response = await axios.post('https://e-commerce-e15c.vercel.app/api/users/login', signInData, {
         withCredentials: true,
       });
       setAlertMessage(response.data.message);
@@ -107,7 +107,7 @@ export default function Header({
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/users/signup', signUpData, {
+      const response = await axios.post('https://e-commerce-e15c.vercel.app/api/users/signup', signUpData, {
         withCredentials: true,
       });
 
