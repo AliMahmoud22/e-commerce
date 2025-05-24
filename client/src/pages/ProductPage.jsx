@@ -23,6 +23,7 @@ export default function ProductPage() {
         );
         setProduct(res.data.document);
         setReviews(res.data.document.reviews || []);
+        setIsLoading(false);
       } catch (error) {
         console.log(`error happpened ${error}`);
         setAlertMessage(
@@ -30,7 +31,6 @@ export default function ProductPage() {
         );
         setAlertType('error');
       }
-      setIsLoading(false);
     };
     getProduct();
   }, [slug]);
@@ -47,11 +47,11 @@ export default function ProductPage() {
       });
       setAlertMessage(`Added to Cart`);
       setAlertType('success');
+      setIsLoading(false);
     } catch (error) {
       setAlertMessage(`Error happened ${error.response.data.message}`);
       setAlertType('error');
     }
-    setIsLoading(false);
   };
   return (
     <>

@@ -29,10 +29,11 @@ export default function HomePage() {
         setProducts(res.data.Data);
         setFilteredProducts(res.data.Data);
         setFeaturedProducts(res.data.Data.filter((product) => product.isFeatured))
+        setIsLoading(false);
       } catch (e) {
         console.log(`error happened ${e}`);
       }
-      setIsLoading(false);
+      
     };
     fetchProducts();
   }, [activeCategory, sort, search, showFeaturedOnly]);
