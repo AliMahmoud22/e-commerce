@@ -8,7 +8,7 @@ import './App.css';
 import ProductPage from './pages/ProductPage.jsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import Cart from './pages/cartPage.jsx';
-import Myorders from './pages/myordersPage.jsx';
+import Myorders from './pages/myOrdersPage.jsx';
 function App() {
   const [user, setUser] = useState(null);
 
