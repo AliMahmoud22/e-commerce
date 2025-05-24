@@ -26,9 +26,9 @@ const ReviewSchema = new mongoose.Schema(
 ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
 
 ReviewSchema.statics.calcAvgRatings = async function (productId) {
-  
   const stats = await this.aggregate([
     {
+      
       $match: { product: productId },
     },
     {
@@ -39,6 +39,7 @@ ReviewSchema.statics.calcAvgRatings = async function (productId) {
       },
     },
   ]);
+  console.log(stats);
   if (stats.length > 0) {
     await Product.findByIdAndUpdate(productId, {
       ratingsCount: stats[0].numRatings,

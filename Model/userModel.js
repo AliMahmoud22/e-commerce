@@ -56,15 +56,6 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-//return active user only
-userSchema.pre(/^find/, async function (next) {
-  this.find({ active: { $ne: false } });
-  next();
-});
-userSchema.pre(/^find/, function (next) {
-  this.populate('cart');
-  next();
-});
 //if password changed then encrypt the password before saving to DB
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
@@ -81,7 +72,15 @@ userSchema.pre('save', function (next) {
   }
   next();
 });
-
+//return active user only
+userSchema.pre(/^find/, async function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+userSchema.pre(/^find/, function (next) {
+  this.populate('cart');
+  next();
+});
 //check the password given with the DB
 userSchema.methods.checkPassword = async (candidatePassword, password) =>
   await bcrypt.compare(candidatePassword, password);

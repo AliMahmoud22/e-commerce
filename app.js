@@ -21,7 +21,7 @@ import productRoute from './Routes/productRoutes.js';
 import cartRoute from './Routes/cartRoutes.js';
 import orderRoute from './Routes/orderRoutes.js';
 import reviewRoute from './Routes/reviewRoutes.js';
-import viewRoute from './Routes/viewRoutes.js';
+
 import * as orderController from './controller/orderController.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,7 +45,7 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: [
-      'http://localhost:5173', //  frontend
+      // 'http://localhost:5173', //  frontend
       /^https:\/\/checkout\.stripe\.com$/, // stripe
       /^https:\/\/res\.cloudinary\.com$/, // cloudinary
     ],
@@ -55,9 +55,7 @@ app.use(
 
 app.set('trust proxy', 1); // Trust only the first proxy (Vercel's)
 
-// Set Pug as template engine
-app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
+
 
 // CSP config
 const scriptSrcUrls = ['https://cdnjs.cloudflare.com', 'https://js.stripe.com'];
@@ -84,7 +82,7 @@ app.use(
 // Logger
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
-}
+} 
 
 // Rate limiter
 const limiter = ratelimit({
@@ -116,10 +114,10 @@ app.use(
 
 // compression
 app.use(compression());
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 // // Routes
-app.use('/', viewRoute);
+
 app.use('/api/users', userRoute);
 app.use('/api/reviews', reviewRoute);
 app.use('/api/products', productRoute);

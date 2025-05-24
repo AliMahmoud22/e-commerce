@@ -61,6 +61,7 @@ const handleValidationErrorDB = (err) => {
 
 const handleDuplicateKeyDB = (err) => {
   let value = `${err.errmsg}`.match(/"([^\\"]*)"/g)[0];
+
   return new AppError(
     `Duplicate field value :${value}. please use another value.`,
     400,
@@ -87,6 +88,7 @@ export default (err, req, res, next) => {
     //another way to create copy or the error
     // let error = { ...err };
     // error.message = err.message;
+   
     if (error.name == 'jwt malformed') error = handleJwtMalformed(error);
     if (error.name == 'CastError') error = handleCastErrorDB(error);
     if (error.name == 'ValidationError') error = handleValidationErrorDB(error);

@@ -25,6 +25,10 @@ const orderSchema = new mongoose.Schema({
     country: String,
     postalCode: String,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
   paidAt: Date,
   paymentIntentId: String, // comes from Strip
 });
@@ -42,7 +46,7 @@ orderSchema.post('save', async function () {
           { new: true },
         ),
     );
-    await  Promise.all(products);
+    await Promise.all(products);
   }
 });
 
@@ -66,7 +70,7 @@ orderSchema.post('findOneAndDelete', async function () {
           { new: true },
         ),
     );
-    await  Promise.all(products);
+    await Promise.all(products);
   }
 });
 

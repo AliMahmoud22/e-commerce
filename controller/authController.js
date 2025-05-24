@@ -5,8 +5,6 @@ import User from '../Model/userModel.js';
 import AppError from '../utils/AppError.js';
 import catchAsync from '../utils/catchAsync.js';
 import Email from '../utils/email.js';
-import { uploadUserPhotoToCloudinary } from './userController.js';
-
 const getToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRESIN,
@@ -77,7 +75,6 @@ const createSendToken = (user, statusCode, message, req, res) => {
 
 export const signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  // uploadUserPhotoToCloudinary(req, res, next);
   createSendToken(newUser, 201, 'signed up successfully 🎉', req, res);
 });
 export const login = catchAsync(async (req, res, next) => {
@@ -194,9 +191,10 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   //3- send resetToken  to user's Email
   try {
     //
-    const resetURL = `${req.protocol}://${req.get('host')}/api/users/resetPassword/${resetToken}`;
-    console.log(resetURL);
-    await new Email(user, resetURL);
+    // const resetURL = `http://localhost:5173/resetPassword/${resetToken}`;
+    const resetURL = `${req.protocol}://${req.get('host')}/resetPassword/${resetToken}`;
+    await new Email(user, resetURL).sendPasswordReset();
+
     res.status(200).json({
       status: 'success',
       message: 'email sent!',
@@ -251,31 +249,3 @@ export const updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
   createSendToken(user, 200, 'password changed successfully', req, res);
 });
-export const isLoggedIn = async (req, res, next) => {
-  if (req.cookies.jwt) {
-    try {
-      //  verify token
-      const decodedToken = await promisify(jwt.verify)(
-        req.cookies.jwt,
-        process.env.JWT_SECRET,
-      );
-      //  user still exits and isn't deleted !
-      const user = await User.findById(decodedToken.id);
-      if (!user) {
-        return next();
-      }
-
-      //  check if passward changed
-      if (user.isPasswordChanged(decodedToken.iat)) {
-        return next();
-      }
-      //user logged in
-
-      res.locals.user = user;
-    } catch (err) {
-      return next();
-    }
-  }
-
-  next();
-};

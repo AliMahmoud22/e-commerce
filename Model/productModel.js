@@ -42,7 +42,7 @@ const productSchema = new mongoose.Schema(
       ],
     },
     brand: { type: String, required: true, default: 'Generic' },
-    images: [String],
+    image: [String],
     imageCover: {
       type: String,
       default:
@@ -58,6 +58,10 @@ const productSchema = new mongoose.Schema(
         message: 'Discount ({VALUE}) must be less than the acutal price.',
       },
     },
+    slug: {
+      type: String,
+      lowercase: true,
+    },
     ratingsCount: {
       type: Number,
       default: 0,
@@ -66,7 +70,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: [0, 'ratingsAverage must be above 1'],
-      max: [5, 'ratingsAverage must be below 5'],
+      max: [10, 'ratingsAverage must be below 10'],
       set: (val) => Math.round(val * 10) / 10,
     },
     createdAt: {
@@ -79,6 +83,7 @@ const productSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
+
 productSchema.index({ price: 1, ratingsAverage: -1 });
 productSchema.index({ slug: 1 });
 

@@ -10,7 +10,7 @@ router.get('/my-orders', orderController.getAll);
 
 router.post('/checkout', orderController.createCheckoutSession); //test with internet
 router.patch('/cancel/:id', orderController.cancelOrder);
-
+router.post('/makeorder', orderController.createtempOrder);
 router.use(authController.restrict('admin'));
 router.route('/').get(orderController.getAll).post(orderController.createOrder);
 router

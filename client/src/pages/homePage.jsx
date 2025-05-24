@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 export default function HomePage() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [search, setSearch] = useState('');
@@ -12,24 +14,25 @@ export default function HomePage() {
   const [currentView, setCurrentView] = useState('all'); // 'all', 'featured', 'category'
 
   useEffect(() => {
-    let url = '/api/products';
-
-    const params = [];
-    if (activeCategory) params.push(`category=${activeCategory}`);
-    if (sort !== '') params.push(`sort=${sort}`);
-    if (search) params.push(`name=${search}`);
-    if (showFeaturedOnly) params.push(`isFeatured=${showFeaturedOnly}`);
-    if (params.length) url += '?' + params.join('&');
-    setIsLoading(true);
-
-    axios
-      .get(url)
-      .then((res) => {
+    const fetchProducts = async () => {
+      let url = '/api/products';
+      const params = [];
+      if (activeCategory) params.push(`category=${activeCategory}`);
+      if (sort !== '') params.push(`sort=${sort}`);
+      if (search) params.push(`name=${search}`);
+      if (showFeaturedOnly) params.push(`isFeatured=${showFeaturedOnly}`);
+      if (params.length) url += '?' + params.join('&');
+      setIsLoading(true);
+      try {
+        const res = await axios.get(url);
         setProducts(res.data.Data);
         setFilteredProducts(res.data.Data);
-      })
-      .catch((e) => console.log(`error happened ${e}`));
-    setIsLoading(false);
+      } catch (e) {
+        console.log(`error happened ${e}`);
+      }
+      setIsLoading(false);
+    };
+    fetchProducts();
   }, [activeCategory, sort, search, showFeaturedOnly]);
 
   const handleSearch = (e) => {
@@ -40,10 +43,9 @@ export default function HomePage() {
     setSortOrder(order);
   };
 
-  const navigateToProductDetails = (productId) => {
-    alert(`Navigating to product ${productId} details page`);
-    // In a real app, you would use React Router:
-    // navigate(`/product/${productId}`);
+  const navigateToProductDetails = (productSlug) => {
+ 
+    navigate(`/product/${productSlug}`);
   };
 
   const handleCategorySelect = (category) => {
@@ -127,9 +129,9 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {featuredProducts.map((product) => (
                     <div
-                      key={product.id}
+                      key={product.slug}
                       className="product-card bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
-                      onClick={() => navigateToProductDetails(product.id)}
+                      onClick={() => navigateToProductDetails(product.slug)}
                     >
                       <div className="relative h-64 overflow-hidden">
                         <img
@@ -246,9 +248,9 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {filteredProducts.map((product) => (
                     <div
-                      key={product.id}
+                      key={product.slug}
                       className="product-card bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
-                      onClick={() => navigateToProductDetails(product.id)}
+                      onClick={() => navigateToProductDetails(product.slug)}
                     >
                       <div className="relative h-48 overflow-hidden">
                         <img

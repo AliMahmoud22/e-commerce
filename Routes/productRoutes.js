@@ -19,7 +19,7 @@ router.patch(
   productController.uploadProductPhotosToCloudinary,
 );
 router
-  .route('/:id')
+  .route('/:slug/:id?')
   .get(productController.getProduct)
   .patch(
     authController.protect,

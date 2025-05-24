@@ -24,11 +24,14 @@ export const getAll = (Model) =>
 export const getOne = (Model, populateOptions) =>
   catchAsync(async (req, res, next) => {
     let query;
-
+    console.log(req.params);
     if (req.params.id) query = await Model.findById(req.params.id);
     else {
+      //searching about product by slug
+      if (req.params.slug) query = Model.findOne({ slug: req.params.slug });
       //if searching with user email
-      if (req.params.email) query = Model.findOne({ email: req.params.email });
+      else if (req.params.email)
+        query = Model.findOne({ email: req.params.email });
       else if (Model === Review) {
         const product = await Product.findOne({ name: req.params.productName });
         const user = await User.findOne({ name: req.params.userName });
@@ -50,9 +53,7 @@ export const getOne = (Model, populateOptions) =>
     if (populateOptions) query = query.populate(populateOptions);
     const document = await query;
     if (!document)
-      return next(
-        new AppError(`No ${Model.modelName} with this name. ❌`, 404),
-      );
+      return next(new AppError(`No ${Model.modelName} with this name.❌`, 404));
     res.status(200).json({
       status: `success`,
       message: `${Model.modelName} found.`,

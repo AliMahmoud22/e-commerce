@@ -16,7 +16,6 @@ export default function Header({
   currentView,
   handleShowHome,
 }) {
-  
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('success'); // or 'error'
   const [showSignUpModal, setShowSignUpModal] = useState(false);
@@ -49,6 +48,7 @@ export default function Header({
       if (e.key === 'Escape') {
         setShowSignInModal(false);
         setShowSignUpModal(false);
+        setShowContactModal(false);
       }
     };
     window.addEventListener('keydown', handleEsc);
@@ -128,6 +128,25 @@ export default function Header({
   const closeContactModal = () => {
     setShowContactModal(false);
   };
+  const handleResetPasswordClick = async () => {
+    if (!signInData.email) {
+      setAlertMessage('please enter your Email.');
+      setAlertType('error');
+      return;
+    }
+    try {
+      await axios.post(
+        '/api/users/forgotPassword',
+        { email: signInData.email },
+        { withCredentials: true },
+      );
+      setAlertMessage('Password reset email sent!');
+      setAlertType('success');
+    } catch (error) {
+      setAlertMessage(error.response?.data.message || 'Error happened! ');
+      setAlertType('error');
+    }
+  };
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
@@ -140,14 +159,19 @@ export default function Header({
         onClose={() => setAlertMessage('')}
       />
       <nav className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-screen mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <div className="h-8 w-40 flex-shrink-0 flex items-center">
+              <Link
+                to="/"
+                onClick={handleShowHome}
+                className="h-8 w-40 flex-shrink-0 flex items-center"
+              >
                 <img src={logo} />
-              </div>
+              </Link>
               <div className="hidden md:ml-6 md:flex md:space-x-8">
-                <button
+                <Link
+                  to="/"
                   onClick={handleShowHome}
                   className={`${
                     currentView === 'all'
@@ -156,12 +180,12 @@ export default function Header({
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                 >
                   Home
-                </button>
+                </Link>
 
                 {isHomePage && (
                   <>
                     <div className="dropdown relative inline-block">
-                      <button className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                      <button className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center  pt-1 border-b-2 text-sm font-medium">
                         Categories
                         <svg
                           className="ml-1 w-4 h-4"
@@ -245,7 +269,7 @@ export default function Header({
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex ml-2 items-center space-x-4">
               {isHomePage && (
                 <>
                   <div className="relative rounded-md shadow-sm">
@@ -325,10 +349,15 @@ export default function Header({
                       className="w-12 h-12 rounded-full object-cover border"
                     />
                   </Link>
-
+                  <Link
+                    to="/my-orders"
+                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 hover:text-red-600"
+                  >
+                    my orders
+                  </Link>
                   <button
                     onClick={handleSignOut}
-                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 hover:text-red-600"
+                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 hover:text-red-700"
                   >
                     Sign out
                     <svg
@@ -434,11 +463,17 @@ export default function Header({
                   Sign In
                 </button>
               </form>
+              <button
+                className="w-full py-2 bg-primary mt-3  text-white rounded  transition"
+                onClick={handleResetPasswordClick}
+              >
+                Forgot Password
+              </button>
             </div>
           </div>
         </div>
       )}
-
+      {/* Sign Up Modal */}
       {showSignUpModal && (
         <div className="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center">
           <div
@@ -525,6 +560,7 @@ export default function Header({
           </div>
         </div>
       )}
+      {/* Contact Modal */}
       {showContactModal && (
         <div className="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center">
           <div

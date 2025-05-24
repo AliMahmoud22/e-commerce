@@ -7,12 +7,15 @@ import ProductModel from '../Model/productModel.js';
 import * as factoryHandler from './factoryHandler.js';
 
 // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const stripe = new Stripe('sk_test_51RPNR3IyfmMT8Q7zoKQ6yi4rnncHT7Jozza8eje2Q8mC987r1aylvMlxnrkCd80dVwmeY4JSoKYuXmHlxZfF0H3n003y63BvKu');
+const stripe = new Stripe(
+  'sk_test_51RPNR3IyfmMT8Q7zoKQ6yi4rnncHT7Jozza8eje2Q8mC987r1aylvMlxnrkCd80dVwmeY4JSoKYuXmHlxZfF0H3n003y63BvKu',
+);
 export const createCheckoutSession = catchAsync(async (req, res, next) => {
   //get cart items
   const cartItems = await CartItemModel.find({ user: req.user.id }).populate(
     'product',
   );
+
   if (cartItems.length == 0) return next(new AppError('cart is empty!', 400));
   const lineItems = cartItems.map((item) => ({
     price_data: {
@@ -20,6 +23,7 @@ export const createCheckoutSession = catchAsync(async (req, res, next) => {
       unit_amount: item.product.price * 100, //in cents
       product_data: {
         name: item.product.name,
+        images: [item.product.imageCover],
       },
     },
 
@@ -28,8 +32,10 @@ export const createCheckoutSession = catchAsync(async (req, res, next) => {
   //create stripe session
   const session = await stripe.checkout.sessions.create({
     customer_email: req.user.email,
-    cancel_url: `${req.protocol}://${req.get('host')}/`,
-    success_url: `${req.protocol}://${req.get('host')}/my-orders?alert=order`,
+    // cancel_url: `http://localhost:5173/`,
+    // success_url: `http://localhost:5173/my-orders`,
+    // cancel_url: `${req.protocol}://${req.get('host')}/`,
+    success_url: `${req.protocol}://${req.get('host')}/my-orders`,
     payment_method_types: ['card'],
     mode: 'payment',
     line_items: lineItems,
@@ -57,9 +63,7 @@ export const getAll = catchAsync(async (req, res, next) => {
       .populate({ path: 'items.product', select: 'name price imageCover' })
       .select('-user -paymentIntentId');
 
-  res
-    .status(200)
-    .json({ status: 'success', length: orders.length, data: orders });
+  res.status(200).json({ status: 'success', length: orders.length, orders });
 });
 export const getOrder = catchAsync(async (req, res, next) => {
   const order = await OrderModel.findById({

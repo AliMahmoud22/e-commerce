@@ -5,7 +5,8 @@ import catchAsync from '../utils/catchAsync.js';
 
 export const getAll = catchAsync(async (req, res, next) => {
   const cart = await CartItemModel.find({ user: req.user.id }).populate(
-    'product','name price imageCover' 
+    'product',
+    'name price imageCover',
   );
   res
     .status(200)
@@ -25,22 +26,19 @@ export const addItem = catchAsync(async (req, res, next) => {
     { $set: { quantity } },
     { new: true, runValidators: true, upsert: true },
   );
-  console.log('additem ')
+  
   // Add the cart item to the user's cart array
   await User.findByIdAndUpdate(
     req.user.id,
     { $addToSet: { cart: cartItem._id } }, // $addToSet ensures no duplicates
-    { new: true }
+    { new: true },
   );
   res.status(200).json({ status: 'success', data: cartItem });
 });
 export const updateItem = catchAsync(async (req, res, next) => {
   const { quantity } = req.body;
-  const updatedItem = await CartItemModel.findOneAndUpdate(
-    {
-      product: req.params.id,
-      user: req.user.id,
-    },
+  const updatedItem = await CartItemModel.findByIdAndUpdate(
+    req.params.id,
     { $set: { quantity } },
     { new: true, runValidators: true },
   );
@@ -48,9 +46,7 @@ export const updateItem = catchAsync(async (req, res, next) => {
   res.status(200).json({ data: updatedItem });
 });
 export const deleteItem = catchAsync(async (req, res, next) => {
-  await CartItemModel.findOneAndDelete({
-    product: req.params.id,
-    user: req.user.id,
-  });
+  await CartItemModel.findByIdAndDelete(req.params.id);
+
   res.status(204).json({ data: null });
 });

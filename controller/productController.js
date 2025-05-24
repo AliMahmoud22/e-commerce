@@ -7,8 +7,8 @@ import * as factoryHandler from './factoryHandler.js';
 import AppError from '../utils/AppError.js';
 import catchAsync from '../utils/catchAsync.js';
 
-export const getAll = factoryHandler.getAll(Product);
-export const getProduct = factoryHandler.getOne(Product);
+export const getAll = factoryHandler.getAll(Product,"reviews");
+export const getProduct = factoryHandler.getOne(Product,"reviews");
 export const createProduct = factoryHandler.createOne(Product);
 export const updateProduct = factoryHandler.updateOne(Product);
 export const deleteProduct = factoryHandler.deleteOne(Product);
@@ -100,7 +100,7 @@ export const uploadProductPhotosToCloudinary = catchAsync(
         req.params.id,
         {
           imageCover: req.body.imageCover,
-          images: req.body.images,
+          image: req.body.images,
         },
         { new: true },
       );

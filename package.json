@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon server.js",
+    "start:prod": "set NODE_ENV=production & nodemon server.js",
     "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle",
     "build:css": "postcss public/css/style.css -o public/css/dist/style.css",
     "watch:css": "postcss public/css/style.css -o public/css/dist/style.css --watch",

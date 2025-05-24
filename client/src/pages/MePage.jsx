@@ -46,16 +46,19 @@ export default function MePage() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Update user data
-      const res = await axios.patch(
-        '/api/users/updateMe',
-        { username: form.username, email: form.email },
-        { withCredentials: true },
-      );
+      // Update user datas
+      let data = {};
+      if (form.username) data.name = form.username;
+      if (form.email) data.email = form.email;
+      console.log(data);
+      const res = await axios.patch('/api/users/me', data, {
+        withCredentials: true,
+      });
       setUser(res.data.user);
       setAlertMessage('Profile updated!');
       setAlertType('success');
     } catch (err) {
+      console.log(err)
       setAlertMessage(err.response?.data?.message || 'Update failed');
       setAlertType('error');
     }
@@ -69,10 +72,15 @@ export default function MePage() {
     try {
       const formData = new FormData();
       formData.append('photo', photo);
-      const res = await axios.patch('/api/users/updatePhoto', formData, {
-        withCredentials: true,
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      console.log(user.id);
+      const res = await axios.patch(
+        `/api/users/upload-photo/${user._id}`,
+        formData,
+        {
+          withCredentials: true,
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
       setUser(res.data.user);
       setAlertMessage('Photo updated!');
       setAlertType('success');
@@ -92,7 +100,7 @@ export default function MePage() {
     setPasswordLoading(true);
     try {
       await axios.patch(
-        '/api/users/updateMyPassword',
+        '/api/users/updatePassword',
         {
           password: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
@@ -130,10 +138,10 @@ export default function MePage() {
             <input
               type="text"
               name="username"
+              placeholder={`${user.name}`}
               value={form.username}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded"
-              required
             />
           </div>
           <div>
@@ -141,10 +149,10 @@ export default function MePage() {
             <input
               type="email"
               name="email"
+              placeholder={`${user.email}`}
               value={form.email}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded"
-              required
             />
           </div>
           <button
