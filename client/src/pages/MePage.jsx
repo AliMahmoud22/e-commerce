@@ -51,13 +51,9 @@ export default function MePage() {
       if (form.username) data.name = form.username;
       if (form.email) data.email = form.email;
       console.log(data);
-      const res = await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/me`,
-        data,
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axios.patch(`/api/users/me`, data, {
+        withCredentials: true,
+      });
       setUser(res.data.user);
       setAlertMessage('Profile updated!');
       setAlertType('success');
@@ -78,9 +74,7 @@ export default function MePage() {
       formData.append('photo', photo);
       console.log(user.id);
       const res = await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/upload-photo/${
-          user._id
-        }`,
+        `/api/users/upload-photo/${user._id}`,
         formData,
         {
           withCredentials: true,
@@ -106,7 +100,7 @@ export default function MePage() {
     setPasswordLoading(true);
     try {
       await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/updatePassword`,
+        `/api/users/updatePassword`,
         {
           password: passwordData.currentPassword,
           newPassword: passwordData.newPassword,

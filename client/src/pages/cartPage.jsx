@@ -13,10 +13,7 @@ export default function Cart() {
     const fetchCart = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/cart`,
-          { withCredentials: true }
-        );
+        const res = await axios.get(`/api/cart`, { withCredentials: true });
         setCartItems(res.data.cartItems || []);
         setIsLoading(false);
       } catch (error) {
@@ -31,9 +28,7 @@ export default function Cart() {
 
   const handleRemove = async (itemId) => {
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/cart/${itemId}`
-      );
+      await axios.delete(`/api/cart/${itemId}`);
       setCartItems(cartItems.filter((item) => item._id !== itemId));
       setAlertMessage('Item removed from cart.');
       setAlertType('success');
@@ -46,7 +41,7 @@ export default function Cart() {
   };
   const handleClear = async () => {
     try {
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/cart/`);
+      await axios.delete(`/api/cart/`);
       setCartItems([]);
       setAlertMessage('cleared Cart.');
       setAlertType('success');
@@ -59,10 +54,7 @@ export default function Cart() {
     console.log(itemId, newQuantity);
     if (newQuantity < 1) return;
     try {
-      await axios.patch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/cart/${itemId}`,
-        { quantity: newQuantity }
-      );
+      await axios.patch(`/api/cart/${itemId}`, { quantity: newQuantity });
       setCartItems((prev) =>
         prev.map((item) =>
           item._id === itemId ? { ...item, quantity: newQuantity } : item
@@ -77,9 +69,7 @@ export default function Cart() {
   };
 
   const handleCheckout = async () => {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/orders/checkout`
-    );
+    const response = await axios.post(`/api/orders/checkout`);
     window.open(response.data.session.url);
   };
 

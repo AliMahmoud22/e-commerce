@@ -6,7 +6,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [featuredProducts,setFeaturedProducts]= useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [sort, setSortOrder] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +16,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      let url = `${import.meta.env.VITE_BACKEND_URL}/api/products`;
+      let url = `/api/products`;
       const params = [];
       if (activeCategory) params.push(`category=${activeCategory}`);
       if (sort !== '') params.push(`sort=${sort}`);
@@ -28,12 +28,13 @@ export default function HomePage() {
         const res = await axios.get(url);
         setProducts(res.data.Data);
         setFilteredProducts(res.data.Data);
-        setFeaturedProducts(res.data.Data.filter((product) => product.isFeatured))
+        setFeaturedProducts(
+          res.data.Data.filter((product) => product.isFeatured)
+        );
         setIsLoading(false);
       } catch (e) {
         console.log(`error happened ${e}`);
       }
-      
     };
     fetchProducts();
   }, [activeCategory, sort, search, showFeaturedOnly]);

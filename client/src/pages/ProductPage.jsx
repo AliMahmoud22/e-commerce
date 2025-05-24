@@ -18,9 +18,7 @@ export default function ProductPage() {
       try {
         setIsLoading(true);
         console.log(slug);
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/products/${slug}`
-        );
+        const res = await axios.get(`/api/products/${slug}`);
         setProduct(res.data.document);
         setReviews(res.data.document.reviews || []);
         setIsLoading(false);
@@ -41,7 +39,7 @@ export default function ProductPage() {
   const handleAddToCart = async () => {
     setIsLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/cart/`, {
+      await axios.post(`/api/cart/`, {
         quantity,
         product: product.id,
       });

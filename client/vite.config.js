@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      // '/api': 'http://localhost:4000', // Adjust to your backend port
+      '/api': `https://e-commerce-e15c.vercel.app`, // Adjust to your backend port
     },
   },
 });

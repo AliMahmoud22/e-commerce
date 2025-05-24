@@ -14,7 +14,7 @@ export default function MyOrdersPage() {
       setIsLoading(true);
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/orders/my-orders`
+          `/api/orders/my-orders`
         );
         setOrders(res.data.orders || []);
         setIsLoading(false);
