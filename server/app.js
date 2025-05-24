@@ -45,6 +45,8 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: [
+      /^https:\/\/e-commerce-gamma-olive-66\.vercel\.app/,
+
       // 'http://localhost:5173', //  frontend
       /^https:\/\/checkout\.stripe\.com$/, // stripe
       /^https:\/\/res\.cloudinary\.com$/, // cloudinary
@@ -54,8 +56,6 @@ app.use(
 );
 
 app.set('trust proxy', 1); // Trust only the first proxy (Vercel's)
-
-
 
 // CSP config
 const scriptSrcUrls = ['https://cdnjs.cloudflare.com', 'https://js.stripe.com'];
@@ -82,7 +82,7 @@ app.use(
 // Logger
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
-} 
+}
 
 // Rate limiter
 const limiter = ratelimit({
@@ -114,7 +114,6 @@ app.use(
 
 // compression
 app.use(compression());
-
 
 // // Routes
 
