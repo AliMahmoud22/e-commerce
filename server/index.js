@@ -84,9 +84,9 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: [
-      'https://e-commerce-gamma-olive-66.vercel.app', // Added as a string
+      'https://e-commerce-rouge-tau-34.vercel.app/', // Added as a string
       'https://e-commerce-git-main-ali-mahmouds-projects-d99978cf.vercel.app/',
-      'https://e-commerce-my8yrsj8y-ali-mahmouds-projects-d99978cf.vercel.app/',
+      'https://e-commerce-owkvpn5x1-ali-mahmouds-projects-d99978cf.vercel.app/',
       /^https:\/\/e-commerce-gamma-olive-66\.vercel\.app/,
       /^https:\/\/checkout\.stripe\.com$/, // stripe
       /^https:\/\/res\.cloudinary\.com$/, // cloudinary
