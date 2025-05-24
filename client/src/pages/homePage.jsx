@@ -6,6 +6,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [featuredProducts,setFeaturedProducts]= useState([]);
   const [search, setSearch] = useState('');
   const [sort, setSortOrder] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +28,7 @@ export default function HomePage() {
         const res = await axios.get(url);
         setProducts(res.data.Data);
         setFilteredProducts(res.data.Data);
+        setFeaturedProducts(res.data.Data.filter((product) => product.isFeatured))
       } catch (e) {
         console.log(`error happened ${e}`);
       }
@@ -65,8 +67,6 @@ export default function HomePage() {
     setCurrentView('all');
   };
 
-  // Get featured products for the featured section
-  const featuredProducts = products.filter((product) => product.isFeatured);
   // Get title for the current view
   const getViewTitle = () => {
     if (currentView === 'featured') return 'Deals & Featured Products';
