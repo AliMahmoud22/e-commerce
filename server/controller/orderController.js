@@ -7,9 +7,7 @@ import ProductModel from '../Model/productModel.js';
 import * as factoryHandler from './factoryHandler.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-// const stripe = new Stripe(
-//   'sk_test_51RPNR3IyfmMT8Q7zoKQ6yi4rnncHT7Jozza8eje2Q8mC987r1aylvMlxnrkCd80dVwmeY4JSoKYuXmHlxZfF0H3n003y63BvKu',
-// );
+
 export const createCheckoutSession = catchAsync(async (req, res, next) => {
   //get cart items
   const cartItems = await CartItemModel.find({ user: req.user.id }).populate(
