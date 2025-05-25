@@ -516,7 +516,7 @@ export default function Header({
               <form onSubmit={handleSignUpSubmit} className="space-y-4 mt-4">
                 <input
                   type="text"
-                  name="username"
+                  name="name"
                   placeholder="Username"
                   value={signUpData.name}
                   onChange={handleSignUpChange}

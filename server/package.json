@@ -2,15 +2,11 @@
   "name": "ecommerce",
   "version": "1.0.0",
   "description": "node",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js",
-    "start:prod": "set NODE_ENV=production & nodemon server.js",
-    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle",
-    "build:css": "postcss public/css/style.css -o public/css/dist/style.css",
-    "watch:css": "postcss public/css/style.css -o public/css/dist/style.css --watch",
-    "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundle"
+    "start": "nodemon server.js",
+    "start:prod": "set NODE_ENV=production && nodemon server.js"
   },
   "author": "ali",
   "license": "ISC",
