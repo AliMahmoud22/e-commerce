@@ -23,7 +23,7 @@ export default function Header({
   const [showContactModal, setShowContactModal] = useState(false);
   const [signInData, setSignInData] = useState({ email: '', password: '' });
   const [signUpData, setSignUpData] = useState({
-    username: '',
+    name: '',
     email: '',
     password: '',
     passwordConfirm: '',
@@ -518,7 +518,7 @@ export default function Header({
                   type="text"
                   name="username"
                   placeholder="Username"
-                  value={signUpData.username}
+                  value={signUpData.name}
                   onChange={handleSignUpChange}
                   className="w-full px-3 py-2 rounded mt-2 bg-gray-100 text-gray-900 focus:outline-none"
                   required

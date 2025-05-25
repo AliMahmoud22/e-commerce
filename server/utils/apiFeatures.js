@@ -1,4 +1,3 @@
-
 class apiFeatures {
   constructor(query, query_String) {
     this.query = query;
@@ -9,6 +8,8 @@ class apiFeatures {
     const excludeFilter = ['page', 'sort', 'limit', 'fields'];
     const queryObj = { ...this.query_String };
     excludeFilter.forEach((el) => delete queryObj[el]);
+    if (queryObj.name) queryObj.name = { $regex: queryObj.name, $options: 'i' };
+    
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     this.query = this.query.find(JSON.parse(queryStr));
