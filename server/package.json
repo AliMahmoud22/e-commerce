@@ -2,11 +2,11 @@
   "name": "ecommerce",
   "version": "1.0.0",
   "description": "node",
-  "main": "app.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js",
-    "start:prod": "set NODE_ENV=production && nodemon server.js"
+    "start": "nodemon index.js",
+    "start:prod": "set NODE_ENV=production && nodemon index.js"
   },
   "author": "ali",
   "license": "ISC",
