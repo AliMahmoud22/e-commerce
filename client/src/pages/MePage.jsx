@@ -234,7 +234,7 @@ export default function MePage() {
             {passwordLoading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
-      </div>
+      </div>     
     </>
   );
 }

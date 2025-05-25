@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import axios from 'axios';
 import Alert from '../components/Alert';
-
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -153,7 +152,7 @@ export default function Cart() {
             </div>
           </div>
         )}
-      </div>
+      </div>    
     </>
   );
 }

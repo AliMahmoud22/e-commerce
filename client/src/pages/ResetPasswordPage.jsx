@@ -1,49 +1,45 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import axios from 'axios';
-import Alert from '../components/Alert';
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import axios from "axios";
+import Alert from "../components/Alert";
+
 export default function ResetPasswordPage() {
   const { resetToken } = useParams();
   const navigate = useNavigate();
 
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('success');
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
   const [loading, setLoading] = useState(false);
 
   const handleReset = async (e) => {
     e.preventDefault();
     if (!password || !passwordConfirm) {
-      setAlertMessage('Please fill in all fields.');
-      setAlertType('error');
+      setAlertMessage("Please fill in all fields.");
+      setAlertType("error");
       return;
     }
     if (password !== passwordConfirm) {
-      setAlertMessage('Passwords do not match.');
-      setAlertType('error');
+      setAlertMessage("Passwords do not match.");
+      setAlertType("error");
       return;
     }
     setLoading(true);
     try {
-      await axios.patch(
-        `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/users/resetPassword/${resetToken}`,
-        {
-          password,
-          passwordConfirm,
-        }
-      );
-      setAlertMessage('Password reset successful! Redirecting to login...');
-      setAlertType('success');
-      setTimeout(() => navigate('/'), 2000);
+      await axios.patch(`/api/users/resetPassword/${resetToken}`, {
+        password,
+        passwordConfirm,
+      });
+      setAlertMessage("Password reset successful! Redirecting to login...");
+      setAlertType("success");
+      setTimeout(() => navigate("/"), 2000);
+      setLoading(false);
     } catch (error) {
-      setAlertMessage(error.response?.data?.message || 'Reset failed.❌');
-      setAlertType('error');
+      setAlertMessage(error.response?.data?.message || "Reset failed.❌");
+      setAlertType("error");
     }
-    setLoading(false);
   };
 
   return (
@@ -52,7 +48,7 @@ export default function ResetPasswordPage() {
       <Alert
         message={alertMessage}
         type={alertType}
-        onClose={() => setAlertMessage('')}
+        onClose={() => setAlertMessage("")}
       />
       <Header />
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
@@ -93,10 +89,11 @@ export default function ResetPasswordPage() {
             className="w-full bg-primary text-white py-2 rounded hover:bg-primary/90 transition"
             disabled={loading}
           >
-            {loading ? 'Resetting...' : 'Reset Password'}
+            {loading ? "Resetting..." : "Reset Password"}
           </button>
         </form>
       </div>
+ 
     </>
   );
 }

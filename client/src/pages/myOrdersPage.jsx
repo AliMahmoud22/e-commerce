@@ -1,32 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
-import axios from 'axios';
-import Alert from '../components/Alert';
+import React, { useEffect, useState } from "react";
+import Header from "../components/Header";
+import axios from "axios";
+import Alert from "../components/Alert";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('success');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
 
   useEffect(() => {
     const fetchOrders = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(
-          `/api/orders/my-orders`
-        );
+        const res = await axios.get(`/api/orders/my-orders`);
         setOrders(res.data.orders || []);
         setIsLoading(false);
       } catch (error) {
         setAlertMessage(
-          error.response?.data?.message || 'Failed to load orders.'
+          error.response?.data?.message || "Failed to load orders."
         );
-        setAlertType('error');
+        setAlertType("error");
       }
     };
     fetchOrders();
   }, []);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    try {
+      await axios.patch(`/api/orders/cancel/${orderId}`);
+      setAlertMessage("Order cancelled successfully.");
+      setAlertType("success");
+      // Refresh orders
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === orderId ? { ...order, status: "cancelled" } : order
+        )
+      );
+    } catch (error) {
+      setAlertMessage(
+        error.response?.data?.message || "Failed to cancel order."
+      );
+      setAlertType("error");
+    }
+  };
 
   return (
     <>
@@ -34,7 +52,7 @@ export default function MyOrdersPage() {
       <Alert
         message={alertMessage}
         type={alertType}
-        onClose={() => setAlertMessage('')}
+        onClose={() => setAlertMessage("")}
       />
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -43,9 +61,11 @@ export default function MyOrdersPage() {
         {isLoading ? (
           <div>Loading...</div>
         ) : orders.length === 0 ? (
-          <div className="text-gray-500">You have no orders yet.</div>
+          <div className="text-gray-500 mt-8 text-center">
+            You have no orders yet.
+          </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-8 mt-3">
             {orders.map((order) => (
               <div key={order._id} className="bg-white rounded shadow p-6">
                 <div className="mb-2 flex justify-between items-center">
@@ -67,24 +87,38 @@ export default function MyOrdersPage() {
                 <div className="mb-2 flex justify-between items-center">
                   <span className="font-semibold">Status:</span>
                   <span
-                    className={
-                      order.isDelivered ? 'text-green-600' : 'text-yellow-600'
-                    }
+                    className={(() => {
+                      if (order.status === "pending") return "text-purple-400-600";
+                      if (order.status === "delivered") return "text-green-600";
+                      if (order.status === "paid") return "text-amber-500";
+                      if (order.status === "shipped") return "text-blue-500";
+                      if (order.status === "cancelled") return "text-red-600";
+                      return "text-gray-600";
+                    })()}
                   >
-                    {order.isDelivered ? 'Delivered' : 'Processing'}
+                    {order.status}
                   </span>
                 </div>
                 <div className="mt-4">
                   <span className="font-semibold">Items:</span>
                   <ul className="list-disc ml-6">
-                    {order.orderItems?.map((item, idx) => (
-                      <li key={idx} className="mb-1">
-                        {item.product?.name || item.name} × {item.quantity} — $
+                    {order.items?.map((item, idx) => (
+                      <li key={idx} className="mb-1 mt-2   text-gray-600">
+                        {item.product?.name || item.name} × {item.quantity} — EGP
                         {(item.price * item.quantity).toFixed(2)}
                       </li>
                     ))}
                   </ul>
                 </div>
+                {/* Cancel button for eligible orders */}
+                {["pending", "paid"].includes(order.status) && (
+                  <button
+                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+                    onClick={() => handleCancelOrder(order._id)}
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
             ))}
           </div>

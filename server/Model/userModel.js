@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
   passwordChangedAt: Date,
-  passwordResetToken: String,
+  passwordResetToken: { type: String, select: false },
   passwordResetTokenExpire: Date,
   cart: [
     {

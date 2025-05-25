@@ -1,8 +1,12 @@
-// utils/database.js
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config({ path: './config.env' });
 
-// const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_URI = process.env.HOSTED_DATABAS;
+let MONGODB_URI;
+if (process.env.NODE_ENV === 'development') {
+  MONGODB_URI = process.env.LOCAL_DATABASE;
+} else 
+MONGODB_URI = process.env.HOSTED_DATABAS;
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
@@ -22,12 +26,10 @@ async function connectToDatabase() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(MONGODB_URI)
-      .then((mongoose) => {
-        console.log('✅ New database connection established.');
-        return mongoose;
-      });
+    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+      console.log('✅ New database connection established.');
+      return mongoose;
+    });
   }
 
   cached.conn = await cached.promise;

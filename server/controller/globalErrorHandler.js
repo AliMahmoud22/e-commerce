@@ -12,10 +12,7 @@ const sendMessageDev = (err, req, res) => {
   //B) WEBSITE
   console.error('error!💥', err);
 
-  return res.status(err.statusCode).render('error', {
-    title: 'Something went wrong!',
-    msg: err.message,
-  });
+  return res.status(err.statusCode);
 };
 
 const sendMessageProd = (err, req, res) => {
@@ -36,17 +33,11 @@ const sendMessageProd = (err, req, res) => {
   //B) WEBSITE
   else {
     if (err.isOperational) {
-      return res.status(err.statusCode).render('error', {
-        title: 'Something went wrong!',
-        msg: err.message,
-      });
+      return res.status(err.statusCode);
     }
     //Unkonw Programming Error Or Unknow Error
     console.error('error!💥', err);
-    return res.status(500).render('error', {
-      title: 'Something went wrong!',
-      msg: 'Please try again later.',
-    });
+    return res.status(500);
   }
 };
 

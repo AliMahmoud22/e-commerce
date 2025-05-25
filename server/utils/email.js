@@ -11,7 +11,8 @@ export default class Email {
   }
   newTransport() {
     //send email using SendGrid service in Production
-    if (process.env.NODE_ENV == 'production') {
+    if (process.env.NODE_ENV ==='production') {
+
       return nodemailer.createTransport({
         service: 'SendGrid',
         auth: {

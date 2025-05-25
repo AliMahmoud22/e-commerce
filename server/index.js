@@ -84,6 +84,7 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: [
+      /^http:\/\/localhost:5173/,
       /^https:\/\/e-commerce-rouge-tau-34\.vercel\.app$/,
       /^https:\/\/e-commerce-git-main-ali-mahmouds-projects-d99978cf\.vercel\.app$/,
       /^https:\/\/e-commerce-owkvpn5x1-ali-mahmouds-projects-d99978cf\.vercel\.app$/,
