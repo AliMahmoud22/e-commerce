@@ -39,11 +39,7 @@ export default function Header({
         })
         .then((res) => setUser(res.data.document))
         .catch((err) => {
-          setAlertMessage(
-            err.response?.data?.message ||
-              "error while getting logged in user data."
-          );
-          setAlertType("error"), setUser(null);
+           setUser(null);
         });
     })();
   }, [showSignInModal, showSignUpModal]);
