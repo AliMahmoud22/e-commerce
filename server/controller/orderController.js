@@ -95,19 +95,12 @@ const makeOrder = catchAsync(async (session) => {
     price: item.product.price,
     quantity: item.quantity,
   }));
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  
   const shipping = session.customer_details?.address;
-  console.log('shipping', shipping);
-  console.log('session', session);
-  console.log('items', items);
-  console.log('totalPrice', totalPrice);
   //create order in DB
   await OrderModel.create({
     user: userId,
-    totalPrice,
+    totalPrice:session.amount_total / 100, //convert cents to dollars
     items,
     paidAt: Date.now(),
     paymentIntentId: session.payment_intent,
@@ -117,7 +110,6 @@ const makeOrder = catchAsync(async (session) => {
       city: shipping.city,
       country: shipping.country,
       postalCode: shipping.postal_code,
-      state: shipping.state,
     },
   });
   //empty cart
