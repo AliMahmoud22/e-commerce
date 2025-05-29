@@ -38,7 +38,7 @@ export default function Header({
           withCredentials: true,
         })
         .then((res) => setUser(res.data.document))
-        .catch((err) => {
+        .catch(() => {
            setUser(null);
         });
     })();

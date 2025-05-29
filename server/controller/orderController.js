@@ -99,20 +99,25 @@ const makeOrder = catchAsync(async (session) => {
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
-  const shipping = session.shipping?.address;
+  const shipping = session.customer_details?.address;
+  console.log('shipping', shipping);
+  console.log('session', session);
+  console.log('items', items);
+  console.log('totalPrice', totalPrice);
   //create order in DB
   await OrderModel.create({
     user: userId,
     totalPrice,
     items,
     paidAt: Date.now(),
-    paymentIntentId: session.paymentIntentId,
-    status: session.status,
+    paymentIntentId: session.payment_intent,
+    status: session.payment_status,
     shippingAddress: {
-      address: shipping.address,
+      address: `${shipping.line1||''} ${shipping.line2 || ''}`,
       city: shipping.city,
       country: shipping.country,
       postalCode: shipping.postal_code,
+      state: shipping.state,
     },
   });
   //empty cart
