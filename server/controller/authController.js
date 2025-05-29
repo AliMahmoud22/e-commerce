@@ -12,7 +12,7 @@ const getToken = (id) => {
 };
 const getRefreshToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '30d',
+    expiresIn:'30d',
   });
 };
 const refreshAccessToken = catchAsync(async (req, res, next) => {
@@ -32,6 +32,7 @@ const refreshAccessToken = catchAsync(async (req, res, next) => {
     // is password changed after refreshtoken created ?
     if (user.isPasswordChanged(decoded.iat))
       return next(new AppError('this token is expired, please log in.'));
+    
     const newAccessToken = getToken(user._id);
     res.cookie('jwt', newAccessToken, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -43,7 +44,7 @@ const refreshAccessToken = catchAsync(async (req, res, next) => {
     req.user = user;
     return next();
   } catch (error) {
-    return next(new AppError('refreshToken expired or invalid!', 401));
+    return next(new AppError('refreshToken expired or invalid, please log in!', 401));
   }
 });
 const createSendToken = (user, statusCode, message, req, res) => {

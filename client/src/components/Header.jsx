@@ -1,11 +1,10 @@
 // src/components/Header.jsx
-import { Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
-import { useState, useEffect } from 'react';
-import logo from '../assets/logo.png';
-import { UserContext } from '../context/UserContext';
-import { useContext } from 'react';
-import Alert from './Alert';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useState, useEffect, useContext } from "react";
+import logo from "../assets/logo.png";
+import { UserContext } from "../context/UserContext";
+import Alert from "./Alert";
 export default function Header({
   searchTerm,
   handleSearch,
@@ -16,43 +15,50 @@ export default function Header({
   currentView,
   handleShowHome,
 }) {
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('success'); // or 'error'
+  const navigate = useNavigate();
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success"); // or 'error'
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
-  const [signInData, setSignInData] = useState({ email: '', password: '' });
+  const [signInData, setSignInData] = useState({ email: "", password: "" });
   const [signUpData, setSignUpData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    passwordConfirm: '',
+    name: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
   });
   const { user, setUser } = useContext(UserContext);
 
   // geting user data if logged in
   useEffect(() => {
     (async () => {
-      await axios
+       axios
         .get(`/api/users/me`, {
           withCredentials: true,
         })
         .then((res) => setUser(res.data.document))
-        .catch(() => setUser(null));
+        .catch((err) => {
+          setAlertMessage(
+            err.response?.data?.message ||
+              "error while getting logged in user data."
+          );
+          setAlertType("error"), setUser(null);
+        });
     })();
   }, [showSignInModal, showSignUpModal]);
 
   // ESC key to close modal
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setShowSignInModal(false);
         setShowSignUpModal(false);
         setShowContactModal(false);
       }
     };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   // Sign out handler
@@ -61,8 +67,8 @@ export default function Header({
     await axios.post(`/api/users/logout`, {
       withCredentials: true,
     });
-    setAlertMessage('Signed out successfully');
-    setAlertType('success');
+    setAlertMessage("Signed out successfully");
+    setAlertType("success");
   };
 
   const handleSignUpClick = () => {
@@ -97,12 +103,13 @@ export default function Header({
         withCredentials: true,
       });
       setAlertMessage(response.data.message);
-      setAlertType('success');
+      setAlertType("success");
       setUser(response.data.user);
       closeSignInModal();
+      if (response.data.user.role === "admin") navigate("/admin");
     } catch (error) {
-      setAlertMessage(error.response?.data?.message || 'An error occurred');
-      setAlertType('error');
+      setAlertMessage(error.response?.data?.message || "An error occurred");
+      setAlertType("error");
     }
   };
 
@@ -114,12 +121,12 @@ export default function Header({
       });
 
       setAlertMessage(response.data.message);
-      setAlertType('success');
+      setAlertType("success");
       setUser(response.data.user);
       closeSignUpModal();
     } catch (error) {
-      setAlertMessage(error.response?.data?.message || 'An error occurred');
-      setAlertType('error');
+      setAlertMessage(error.response?.data?.message || "An error occurred");
+      setAlertType("error");
     }
   };
 
@@ -132,8 +139,8 @@ export default function Header({
   };
   const handleResetPasswordClick = async () => {
     if (!signInData.email) {
-      setAlertMessage('please enter your Email.');
-      setAlertType('error');
+      setAlertMessage("please enter your Email.");
+      setAlertType("error");
       return;
     }
     try {
@@ -142,15 +149,16 @@ export default function Header({
         { email: signInData.email },
         { withCredentials: true }
       );
-      setAlertMessage('Password reset email sent!');
-      setAlertType('success');
+      setAlertMessage("Password reset email sent!");
+      setAlertType("success");
     } catch (error) {
-      setAlertMessage(error.response?.data.message || 'Error happened! ');
-      setAlertType('error');
+      setAlertMessage(error.response?.data.message || "Error happened! ");
+      setAlertType("error");
     }
   };
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
+  const isAdmin = user && user.role === "admin";
+  const isHomePage = location.pathname === "/";
 
   return (
     <>
@@ -158,7 +166,7 @@ export default function Header({
       <Alert
         message={alertMessage}
         type={alertType}
-        onClose={() => setAlertMessage('')}
+        onClose={() => setAlertMessage("")}
       />
       <nav className="bg-white shadow-md">
         <div className="max-w-screen mx-auto px-4 sm:px-6 lg:px-8">
@@ -176,9 +184,9 @@ export default function Header({
                   to="/"
                   onClick={handleShowHome}
                   className={`${
-                    currentView === 'all'
-                      ? 'border-b-2 border-primary text-gray-900'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    currentView === "all"
+                      ? "border-b-2 border-primary text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                   } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                 >
                   Home
@@ -206,43 +214,43 @@ export default function Header({
                       </button>
                       <div className="dropdown-menu absolute z-10 mt-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1">
                         <button
-                          onClick={() => handleCategorySelect('fashion')}
+                          onClick={() => handleCategorySelect("fashion")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Fashion
                         </button>
                         <button
-                          onClick={() => handleCategorySelect('sports')}
+                          onClick={() => handleCategorySelect("sports")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Sports
                         </button>
                         <button
-                          onClick={() => handleCategorySelect('electronics')}
+                          onClick={() => handleCategorySelect("electronics")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Electronics
                         </button>
                         <button
-                          onClick={() => handleCategorySelect('other')}
+                          onClick={() => handleCategorySelect("other")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Other
                         </button>
                         <button
-                          onClick={() => handleCategorySelect('beauty')}
+                          onClick={() => handleCategorySelect("beauty")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Beauty
                         </button>
                         <button
-                          onClick={() => handleCategorySelect('home')}
+                          onClick={() => handleCategorySelect("home")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Home
                         </button>
                         <button
-                          onClick={() => handleCategorySelect('books')}
+                          onClick={() => handleCategorySelect("books")}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                         >
                           Books
@@ -251,9 +259,9 @@ export default function Header({
                     </div>
                     <button
                       className={`${
-                        currentView === 'featured'
-                          ? 'border-b-2 border-primary text-gray-900'
-                          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        currentView === "featured"
+                          ? "border-b-2 border-primary text-gray-900"
+                          : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                       } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                       onClick={handleShowDeals}
                     >
@@ -269,6 +277,20 @@ export default function Header({
                   Contact
                 </button>
               </div>
+              {isAdmin && (
+                <div className="px-5">
+                  <Link
+                    to="/admin"
+                    className={`${
+                      location.pathname === "/admin"
+                        ? "border-b-2 border-primary text-gray-900"
+                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  >
+                    Dashboard
+                  </Link>
+                </div>
+              )}
             </div>
 
             <div className="flex ml-2 items-center space-x-4">
@@ -346,20 +368,20 @@ export default function Header({
                   {/* user iamge*/}
                   <Link to="/me" className="relative">
                     <img
-                      src={user.photo || '/default-avatar.png'}
+                      src={user.photo || "/default-avatar.png"}
                       alt="User"
                       className="w-12 h-12 rounded-full object-cover border"
                     />
                   </Link>
                   <Link
                     to="/my-orders"
-                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 hover:text-red-600"
+                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 rounded-3xl bg-blue-300 hover:bg-blue-400 transition  "
                   >
                     my orders
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 hover:text-red-700"
+                    className="px-3 py-2 text-sm font-medium inline-flex align-items  text-gray-700 "
                   >
                     Sign out
                     <svg

@@ -14,7 +14,7 @@ export default function Alert({ message, type = 'success', onClose }) {
 
   if (!message) return null;
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-fit max-w-md px-4">
+    <div className="fixed top-6 left-1/3 -translate-x-1/2 z-[9999] w-full max-w-md px-4">
       <div
         className={`flex items-center gap-3 rounded-lg shadow-lg px-4 py-3 ${
           type === 'success'

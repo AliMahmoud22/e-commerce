@@ -133,8 +133,8 @@ export default function ProductPage() {
                     onClick={() => handleImageClick(product.imageCover)}
                   />
                   {/* Show other images if available */}
-                  {product.image &&
-                    product.image.map(
+                  {product.images &&
+                    product.images.map(
                       (img, idx) =>
                         img && (
                           <img
@@ -181,8 +181,12 @@ export default function ProductPage() {
                   </span>
                 </div>
                 <div className="mb-2">
-                  <span className="font-semibold">Category:</span>{" "}
+                  <span className="font-semibold">Category: </span>
                   {product.category}
+                </div>
+                <div className="mb-2">
+                  <span className="font-semibold">Brand: </span>
+                  {product.brand}
                 </div>
                 <div className="mb-2">
                   <span className="font-semibold">Price:</span>{" "}

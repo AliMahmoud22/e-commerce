@@ -50,7 +50,6 @@ export default function Cart() {
     }
   };
   const handleQuantityChange = async (itemId, newQuantity) => {
-    console.log(itemId, newQuantity);
     if (newQuantity < 1) return;
     try {
       await axios.patch(`/api/cart/${itemId}`, { quantity: newQuantity });

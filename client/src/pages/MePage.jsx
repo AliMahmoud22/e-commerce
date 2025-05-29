@@ -50,7 +50,6 @@ export default function MePage() {
       let data = {};
       if (form.username) data.name = form.username;
       if (form.email) data.email = form.email;
-      console.log(data);
       const res = await axios.patch(`/api/users/me`, data, {
         withCredentials: true,
       });
@@ -72,7 +71,7 @@ export default function MePage() {
     try {
       const formData = new FormData();
       formData.append('photo', photo);
-      console.log(user.id);
+    
       const res = await axios.patch(
         `/api/users/upload-photo/${user._id}`,
         formData,

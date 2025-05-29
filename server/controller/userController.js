@@ -16,6 +16,7 @@ const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 export const uploadUserPhoto = upload.single('photo');
 export const uploadUserPhotoToCloudinary = catchAsync(
   async (req, res, next) => {
+    
     //check if there is image
     if (!req.file) return next(new AppError('No photo uploaded!', 404));
 

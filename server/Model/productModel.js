@@ -42,22 +42,14 @@ const productSchema = new mongoose.Schema(
       ],
     },
     brand: { type: String, required: true, default: 'Generic' },
-    image: [String],
+    images: [String],
     imageCover: {
       type: String,
       default:
         'https://res.cloudinary.com/dytz39qgw/image/upload/v1747781286/product_default.jpg',
-      // required: [true, 'A product must have a cover image.'],
     },
-    discount: {
-      type: Number,
-      validate: {
-        validator: function (el) {
-          return this.price > el;
-        },
-        message: 'Discount ({VALUE}) must be less than the acutal price.',
-      },
-    },
+    discount: Number,
+
     slug: {
       type: String,
       lowercase: true,
@@ -107,6 +99,38 @@ productSchema.pre('save', function (next) {
 });
 productSchema.pre('remove', function (next) {
   if (this.stock > 0) return next(new AppError('you cant remove this product'));
+  next();
+});
+//to check the discount value before saving or updating
+productSchema.pre('save', function (next) {
+  if (this.discount && this.discount >= this.price) {
+    return next(
+      new AppError('Discount must be less than the actual price.', 400),
+    );
+  }
+  next();
+});
+productSchema.pre(/^findOneAndUpdate|updateOne$/, async function (next) {
+  const update = this.getUpdate();
+  const { discount } = update;
+  let { price } = update;
+
+  if (discount !== undefined) {
+    let actualPrice = price;
+    // If price isn't included in the update, fetch it from the DB
+    if (price === undefined) {
+      const doc = await this.model.findOne(this.getQuery());
+      if (!doc) return next(new AppError('Product not found.', 404));
+      actualPrice = doc.price;
+    }
+
+    if (discount >= actualPrice) {
+      return next(
+        new AppError('Discount must be less than the actual price.', 400),
+      );
+    }
+  }
+
   next();
 });
 

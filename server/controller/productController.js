@@ -7,12 +7,54 @@ import * as factoryHandler from './factoryHandler.js';
 import AppError from '../utils/AppError.js';
 import catchAsync from '../utils/catchAsync.js';
 
-export const getAll = factoryHandler.getAll(Product,"reviews");
-export const getProduct = factoryHandler.getOne(Product,"reviews");
+export const getAll = factoryHandler.getAll(Product, 'reviews');
+export const getProduct = factoryHandler.getOne(Product, 'reviews');
 export const createProduct = factoryHandler.createOne(Product);
 export const updateProduct = factoryHandler.updateOne(Product);
-export const deleteProduct = factoryHandler.deleteOne(Product);
+export const deleteProduct = catchAsync(async (req, res, next) => {
+  const product = await Product.findOne({ slug: req.params.slug });
 
+  if (!product) {
+    return next(new AppError('Product not found', 404));
+  }
+  function extractPublicId(cloudinaryUrl) {
+    const urlParts = cloudinaryUrl.split('/');
+    const fileNameWithExtension = urlParts.pop(); // get the file name
+    const folderPath = urlParts.slice(7).join('/'); // from after 'upload'
+    const publicId = fileNameWithExtension.replace(/\.[^/.]+$/, ''); // remove extension
+    return `${folderPath}/${publicId}`;
+  }
+
+  // Delete image from Cloudinary
+  if (product.imageCover) {
+    await cloudinary.uploader.destroy(
+      extractPublicId(product.imageCover),
+      (err, result) => {
+        if (err) {
+          console.error('Error deleting image from Cloudinary:', err);
+        }
+      },
+    );
+  }
+
+  if (product.images) {
+    product.images.forEach(async (image) => {
+      await cloudinary.uploader.destroy(
+        extractPublicId(image),
+        (err, result) => {
+          if (err) {
+            console.error('Error deleting image from Cloudinary:', err);
+          }
+        },
+      );
+    });
+  }
+  await Product.findOneAndDelete({ slug: req.params.slug });
+  res.status(204).json({
+    status: 'success',
+    message: 'Product deleted successfully',
+  });
+});
 const multerStorage = multer.memoryStorage();
 const multerFileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
@@ -31,7 +73,7 @@ export const uploadProductPhotosToCloudinary = catchAsync(
       if (req.files.imageCover) {
         const imageCoverName = `product-${req.params.id}-${Date.now()}-cover.jpeg`;
         const buffer = await sharp(req.files.imageCover[0].buffer)
-          .resize(2000, 1333)
+          // .resize(2000, 1333)
           .toFormat('jpeg')
           .jpeg({ quality: 90 })
           .toBuffer();
@@ -62,11 +104,11 @@ export const uploadProductPhotosToCloudinary = catchAsync(
       if (req.files.images) {
         //store images url
         req.body.images = [];
-        await  Promise.all(
+        await Promise.all(
           req.files.images.map(async (img, i) => {
             const imgName = `product-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
             const buffer = await sharp(img.buffer)
-              .resize(800, 800)
+              // .resize(800, 800)
               .toFormat('jpeg')
               .jpeg({ quality: 80 })
               .toBuffer();
@@ -100,7 +142,7 @@ export const uploadProductPhotosToCloudinary = catchAsync(
         req.params.id,
         {
           imageCover: req.body.imageCover,
-          image: req.body.images,
+          images: req.body.images,
         },
         { new: true },
       );

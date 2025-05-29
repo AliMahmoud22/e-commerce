@@ -8,6 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        ...colors,
         primary: '#3b82f6',
         secondary: '#10b981',
         accent: '#8b5cf6',
@@ -25,9 +26,6 @@ export default {
       animation: {
         fadeIn: 'fadeIn 0.3s ease-out forwards',
       },
-    },
-    colors: {
-      ...colors, // <-- add this to keep all default colors
     },
   },
   plugins: [],

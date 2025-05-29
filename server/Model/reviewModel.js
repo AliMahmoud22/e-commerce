@@ -39,7 +39,6 @@ ReviewSchema.statics.calcAvgRatings = async function (productId) {
       },
     },
   ]);
-  console.log(stats);
   if (stats.length > 0) {
     await Product.findByIdAndUpdate(productId, {
       ratingsCount: stats[0].numRatings,
@@ -69,7 +68,7 @@ ReviewSchema.post(/^findOneAnd/, async function () {
 ReviewSchema.pre(/^find/, function (next) {
   this.populate({ path: 'product', select: 'name stock' })
     .populate({ path: 'user', select: 'name photo' })
-    .select('-__v -_id');
+    .select('-__v');
   next();
 });
 

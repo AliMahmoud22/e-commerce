@@ -5,9 +5,11 @@ import OrderModel from '../Model/orderModel.js';
 import CartItemModel from '../Model/cartitemModel.js';
 import ProductModel from '../Model/productModel.js';
 import * as factoryHandler from './factoryHandler.js';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
+import User from '../Model/userModel.js';
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(
+  'sk_test_51RPNR3IyfmMT8Q7zoKQ6yi4rnncHT7Jozza8eje2Q8mC987r1aylvMlxnrkCd80dVwmeY4JSoKYuXmHlxZfF0H3n003y63BvKu',
+);
 export const createCheckoutSession = catchAsync(async (req, res, next) => {
   //get cart items
   const cartItems = await CartItemModel.find({ user: req.user.id }).populate(
@@ -49,18 +51,31 @@ export const createCheckoutSession = catchAsync(async (req, res, next) => {
 });
 export const getAll = catchAsync(async (req, res, next) => {
   let orders;
-
+  let filter = {};
   //show admin all orders
-  if (req.user.role === 'admin')
-    orders = await OrderModel.find()
+  if (req.user.role === 'admin') {
+    if (req.query.id) {
+      filter._id = req.query.id;
+    }
+    if (req.query.username) {
+      const user = await User.findOne({
+        name: { $regex: req.query.username, $options: 'i' },
+      }).select('_id');
+      if (!user)
+        return next(new AppError('no user found with this name.', 404));
+      filter.user = user._id;
+    }
+    orders = await OrderModel.find(filter)
       .populate('user', 'name email')
       .populate({ path: 'items.product', select: 'name price imageCover' });
+  }
+
   // show user all his orders
-  else
+  else {
     orders = await OrderModel.find({ user: req.user.id })
       .populate({ path: 'items.product', select: 'name price imageCover' })
       .select('-user -paymentIntentId');
-
+  }
   res.status(200).json({ status: 'success', length: orders.length, orders });
 });
 export const getOrder = catchAsync(async (req, res, next) => {

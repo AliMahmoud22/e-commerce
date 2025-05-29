@@ -9,7 +9,7 @@ router
   .post(reviewController.setProductIdAndUserId, reviewController.createOne);
 
 router
-  .route('/:productName/:userName/:id?')
+  .route('/:productName/:userName')
   .get(reviewController.getOne)
   .patch(reviewController.updateOne)
   .delete(reviewController.deleteOne);

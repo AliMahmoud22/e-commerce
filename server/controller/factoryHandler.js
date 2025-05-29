@@ -7,6 +7,7 @@ import Product from '../Model/productModel.js';
 
 export const getAll = (Model) =>
   catchAsync(async (req, res, next) => {
+  
     let filter = {};
     if (req.params.productId) filter = { product: req.params.productId };
     const apifeatures = new apiFeatures(Model.find(filter), req.query)
@@ -24,7 +25,7 @@ export const getAll = (Model) =>
 export const getOne = (Model, populateOptions) =>
   catchAsync(async (req, res, next) => {
     let query;
-    console.log(req.params);
+ 
     if (req.params.id) query = await Model.findById(req.params.id);
     else {
       //searching about product by slug
@@ -42,7 +43,7 @@ export const getOne = (Model, populateOptions) =>
               404,
             ),
           );
-        query = Model.findOne({
+        query = Model.find({
           user: user._id,
           product: product._id,
         })
@@ -89,8 +90,8 @@ export const deleteOne = (Model) =>
           select: 'name',
         });
     }
-    //searching abouut product by name
-    else doc = await Model.findOneAndDelete({ name: req.params.name });
+    //searching about product by slug
+    else doc = await Model.findOneAndDelete({ slug: req.params.slug });
 
     if (!doc) {
       return next(
@@ -105,7 +106,6 @@ export const deleteOne = (Model) =>
 export const updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     let document;
-
     if (Model === Review) {
       const product = await Product.findOne({ name: req.params.productName });
       const user = await User.findOne({ name: req.params.userName });
@@ -130,20 +130,31 @@ export const updateOne = (Model) =>
 
     //searching about user
     else if (req.params.id) {
-      document = await Model.findByIdAndUpdate(req.params.id, req.body, {
-        runValidators: true,
-        new: true,
-      });
+      const { name, email } = req.body;
+      document = await Model.findByIdAndUpdate(
+        req.params.id,
+        { name, email },
+        {
+          runValidators: true,
+          new: true,
+        },
+      );
     }
-    //searching about product by name
+    //searching about product by slug
     else
-      document = Model.findOneAndUpdate({ name: req.body.name }, req.body, {
-        runValidators: true,
-        new: true,
-      });
+      document = await Model.findOneAndUpdate(
+        { slug: req.params.slug },
+        req.body,
+        {
+          runValidators: true,
+          new: true,
+        },
+      );
+    
 
     if (!document)
       return next(new AppError(`No ${Model.modelName} found.`, 404));
+
     res.status(200).json({
       status: 'success',
       message: `${Model.modelName} found.`,

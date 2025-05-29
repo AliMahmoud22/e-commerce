@@ -1,28 +1,28 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 export default function HomePage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [search, setSearch] = useState('');
-  const [sort, setSortOrder] = useState('');
+  const [search, setSearch] = useState("");
+  const [sort, setSortOrder] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState(null);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
-  const [currentView, setCurrentView] = useState('all'); // 'all', 'featured', 'category'
+  const [currentView, setCurrentView] = useState("all"); // 'all', 'featured', 'category'
 
   useEffect(() => {
     const fetchProducts = async () => {
       let url = `/api/products`;
       const params = [];
       if (activeCategory) params.push(`category=${activeCategory}`);
-      if (sort !== '') params.push(`sort=${sort}`);
+      if (sort !== "") params.push(`sort=${sort}`);
       if (search) params.push(`name=${search}`);
       if (showFeaturedOnly) params.push(`isFeatured=${showFeaturedOnly}`);
-      if (params.length) url += '?' + params.join('&');
+      if (params.length) url += "?" + params.join("&");
       setIsLoading(true);
       try {
         const res = await axios.get(url);
@@ -40,6 +40,7 @@ export default function HomePage() {
   }, [activeCategory, sort, search, showFeaturedOnly]);
 
   const handleSearch = (e) => {
+    
     setSearch(e.target.value);
   };
 
@@ -54,29 +55,29 @@ export default function HomePage() {
   const handleCategorySelect = (category) => {
     setActiveCategory(category);
     setShowFeaturedOnly(false);
-    setCurrentView('category');
+    setCurrentView("category");
   };
 
   const handleShowDeals = () => {
     setShowFeaturedOnly(true);
     setActiveCategory(null);
-    setCurrentView('featured');
+    setCurrentView("featured");
   };
 
   const handleShowHome = () => {
     setActiveCategory(null);
     setShowFeaturedOnly(false);
-    setCurrentView('all');
+    setCurrentView("all");
   };
 
   // Get title for the current view
   const getViewTitle = () => {
-    if (currentView === 'featured') return 'Deals & Featured Products';
-    if (currentView === 'category')
+    if (currentView === "featured") return "Deals & Featured Products";
+    if (currentView === "category")
       return `${
         activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)
       } Products`;
-    return 'All Products';
+    return "All Products";
   };
 
   return (
@@ -118,7 +119,7 @@ export default function HomePage() {
           </div>
 
           {/* Featured Products Section - Only show on homepage */}
-          {currentView === 'all' && (
+          {currentView === "all" && (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-8">
                 Featured Products
@@ -147,7 +148,7 @@ export default function HomePage() {
                             {product.name}
                           </h3>
                           <p className="text-sm text-center">
-                            {product.description}
+                            {product.description.slice(0, 25)} ...
                           </p>
                           <button className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition-colors">
                             View Details
@@ -263,7 +264,7 @@ export default function HomePage() {
                         />
                         <div className="product-overlay absolute inset-0 bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 flex flex-col justify-center items-center p-4 text-white">
                           <p className="text-sm text-center">
-                            {product.description}
+                            {product.description.slice(0, 25)}...
                           </p>
                           <button className="mt-3 px-3 py-1 bg-white text-primary rounded hover:bg-gray-100 transition-colors text-sm">
                             Quick View
@@ -319,8 +320,8 @@ export default function HomePage() {
                   <div className="mt-6">
                     <button
                       onClick={() => {
-                        setSearch('');
-                        setSortOrder('');
+                        setSearch("");
+                        setSortOrder("");
                         handleShowHome();
                       }}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -365,7 +366,7 @@ export default function HomePage() {
                   </li>
                   <li>
                     <button
-                      onClick={() => handleCategorySelect('electronics')}
+                      onClick={() => handleCategorySelect("electronics")}
                       className="hover:text-white"
                     >
                       Electronics
@@ -373,7 +374,7 @@ export default function HomePage() {
                   </li>
                   <li>
                     <button
-                      onClick={() => handleCategorySelect('fashion')}
+                      onClick={() => handleCategorySelect("fashion")}
                       className="hover:text-white"
                     >
                       Fashion

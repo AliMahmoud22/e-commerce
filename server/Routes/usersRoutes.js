@@ -25,7 +25,7 @@ router.patch('/updatePassword', authController.updatePassword);
 
 //admin
 router.use(authController.restrict('admin'));
-router.route('/').get(userController.getAllUsers);
+router.route('/').get(userController.getAllUsers).post(userController.createUser);
 router
   .route('/:id')
   .get(userController.getUser)
