@@ -12,7 +12,7 @@ const getToken = (id) => {
 };
 const getRefreshToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn:'30d',
+    expiresIn: '30d',
   });
 };
 const refreshAccessToken = catchAsync(async (req, res, next) => {
@@ -26,13 +26,15 @@ const refreshAccessToken = catchAsync(async (req, res, next) => {
       refreshToken,
       process.env.JWT_REFRESH_SECRET,
     );
-    const user = User.findById(decoded.id);
+    const user = await User.findById(decoded.id);
     if (!user) return next(new AppError('user is no longer exit', 404));
 
     // is password changed after refreshtoken created ?
     if (user.isPasswordChanged(decoded.iat))
-      return next(new AppError('this token is expired, please log in.'));
-    
+      return next(
+        new AppError('Password recently changed. Please log in again.', 401),
+      );
+
     const newAccessToken = getToken(user._id);
     res.cookie('jwt', newAccessToken, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -40,11 +42,10 @@ const refreshAccessToken = catchAsync(async (req, res, next) => {
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
     });
 
-    res.locals.user = user; // for pug variables
     req.user = user;
     return next();
   } catch (error) {
-    return next(new AppError('refreshToken expired or invalid, please log in!', 401));
+    return next(new AppError(' please log in again!', 401));
   }
 });
 const createSendToken = (user, statusCode, message, req, res) => {
@@ -160,7 +161,7 @@ export const protect = catchAsync(async (req, res, next) => {
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
     });
   }
-  res.locals.user = user;
+
   req.user = user;
   next();
 });

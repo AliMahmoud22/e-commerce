@@ -21,7 +21,7 @@ class apiFeatures {
       const Sort = this.query_String.sort.split(',').join(' ');
       this.query = this.query.sort(Sort);
     } else {
-      this.query = this.query.sort('createdAt');
+      this.query = this.query.sort('_id');
     }
     return this;
   }

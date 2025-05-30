@@ -7,21 +7,6 @@ export const setProductIdAndUserId = (req, res, next) => {
     next();
   };
 export const getAll = factoryHandler.getAll(reviewModel);
-// export const getAll = catchAsync(async (req, res, next) => {
-//   await reviewModel.find()
-//     .populate('user', 'name')
-//     .populate('product', 'name')
-//     .then((reviews) => {
-//       res.status(200).json({
-//         status: 'success',
-//         message: 'Reviews fetched successfully.',
-//         document: reviews,
-//       });
-//     })
-//     .catch((err) => {
-//       next(err);
-//     });
-// });
 export const getOne = factoryHandler.getOne(reviewModel);
 export const createOne = factoryHandler.createOne(reviewModel);
 export const updateOne = factoryHandler.updateOne(reviewModel);

@@ -2,10 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import Pagination from "../components/Pagination";
 export default function HomePage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [sort, setSortOrder] = useState("");
@@ -13,6 +13,9 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState(null);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [currentView, setCurrentView] = useState("all"); // 'all', 'featured', 'category'
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const PRODUCTS_PER_PAGE = 12; // You can adjust this value
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -22,30 +25,38 @@ export default function HomePage() {
       if (sort !== "") params.push(`sort=${sort}`);
       if (search) params.push(`name=${search}`);
       if (showFeaturedOnly) params.push(`isFeatured=${showFeaturedOnly}`);
+      params.push(`page=${currentPage}`);
+      params.push(`limit=${PRODUCTS_PER_PAGE}`);
       if (params.length) url += "?" + params.join("&");
+
       setIsLoading(true);
       try {
         const res = await axios.get(url);
         setProducts(res.data.Data);
-        setFilteredProducts(res.data.Data);
         setFeaturedProducts(
           res.data.Data.filter((product) => product.isFeatured)
         );
         setIsLoading(false);
+        setCurrentPage(res.data.currentPage);
+        setTotalPages(res.data.totalPages);
       } catch (e) {
-        console.log(`error happened ${e}`);
+        console.log(
+          e.response?.data?.message ||
+            "An error occurred while getting products."
+        );
       }
     };
     fetchProducts();
-  }, [activeCategory, sort, search, showFeaturedOnly]);
+  }, [activeCategory, sort, search, showFeaturedOnly, currentPage]);
 
   const handleSearch = (e) => {
-    
     setSearch(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleSort = (order) => {
     setSortOrder(order);
+    setCurrentPage(1);
   };
 
   const navigateToProductDetails = (productSlug) => {
@@ -56,18 +67,22 @@ export default function HomePage() {
     setActiveCategory(category);
     setShowFeaturedOnly(false);
     setCurrentView("category");
+    setCurrentPage(1);
   };
 
   const handleShowDeals = () => {
     setShowFeaturedOnly(true);
     setActiveCategory(null);
     setCurrentView("featured");
+    // setTotalPages(featuredProducts.length / PRODUCTS_PER_PAGE);
+    setCurrentPage(1);
   };
 
   const handleShowHome = () => {
     setActiveCategory(null);
     setShowFeaturedOnly(false);
     setCurrentView("all");
+    setCurrentPage(1);
   };
 
   // Get title for the current view
@@ -131,7 +146,7 @@ export default function HomePage() {
                 </div>
               ) : featuredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {featuredProducts.map((product) => (
+                  {featuredProducts.slice(0, 3).map((product) => (
                     <div
                       key={product.slug}
                       className="product-card bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
@@ -160,9 +175,21 @@ export default function HomePage() {
                           {product.name}
                         </h3>
                         <div className="flex justify-between items-center mt-2">
-                          <span className="text-xl font-bold text-primary">
-                            {product.price.toFixed(2)} EGP
-                          </span>
+                          {product.discount ? (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xl font-bold text-gray-500 line-through">
+                                {product.price.toFixed(2)} EGP
+                              </span>
+                              <span className="text-xl font-bold text-primary">
+                                {(product.price - product.discount).toFixed(2)}{" "}
+                                EGP
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xl font-bold text-primary">
+                              {product.price.toFixed(2)} EGP
+                            </span>
+                          )}
                           <div className="flex items-center">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                               Featured
@@ -248,9 +275,9 @@ export default function HomePage() {
                 <div className="flex justify-center items-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                 </div>
-              ) : filteredProducts.length > 0 ? (
+              ) : products.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {filteredProducts.map((product) => (
+                  {products.map((product) => (
                     <div
                       key={product.slug}
                       className="product-card bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer"
@@ -276,9 +303,22 @@ export default function HomePage() {
                           {product.name}
                         </h3>
                         <div className="flex justify-between items-center mt-2">
-                          <span className="text-lg font-bold text-primary">
-                            {product.price.toFixed(2)} EGP
-                          </span>
+                          {product.discount ? (
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xl font-bold text-gray-500 line-through">
+                                {product.price.toFixed(2)} EGP
+                              </span>
+                              <span className="text-xl font-bold text-primary">
+                                {(product.price - product.discount).toFixed(2)}{" "}
+                                EGP
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xl font-bold text-primary">
+                              {product.price.toFixed(2)} EGP
+                            </span>
+                          )}
+
                           <div className="flex items-center space-x-2">
                             {product.isFeatured && (
                               <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -332,6 +372,13 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                if (page >= 1 && page <= totalPages) setCurrentPage(page);
+              }}
+            />
           </div>
         </main>
 

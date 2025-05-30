@@ -7,17 +7,30 @@ import Product from '../Model/productModel.js';
 
 export const getAll = (Model) =>
   catchAsync(async (req, res, next) => {
-  
     let filter = {};
     if (req.params.productId) filter = { product: req.params.productId };
+    if(req.query.isFeatured )filter = { isFeatured: req.query.isFeatured };
+    const totalDocuments = await Model.countDocuments(filter); // total count before pagination
+
     const apifeatures = new apiFeatures(Model.find(filter), req.query)
       .filter()
       .fields()
       .sort()
       .paginate();
     const documents = await apifeatures.query;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 100;
+    const totalPages = Math.ceil(totalDocuments / limit);
+
+    if (documents.length === 0 && totalDocuments > 0) {
+      return next(new AppError('Page does not exist', 404));
+    }
+
     res.status(200).json({
       status: 'success',
+      currentPage: page,
+      totalPages,
+      totalResults: totalDocuments,
       results: documents.length,
       Data: documents,
     });
@@ -25,7 +38,7 @@ export const getAll = (Model) =>
 export const getOne = (Model, populateOptions) =>
   catchAsync(async (req, res, next) => {
     let query;
- 
+
     if (req.params.id) query = await Model.findById(req.params.id);
     else {
       //searching about product by slug
@@ -121,13 +134,6 @@ export const updateOne = (Model) =>
         },
       );
     }
-    //searching about user with email
-    // else if (req.params.email)
-    //   document = Model.findOneAndUpdate({ email: req.params.email }, req.body, {
-    //     runValidators: true,
-    //     new: true,
-    //   });
-
     //searching about user
     else if (req.params.id) {
       const { name, email } = req.body;
@@ -150,7 +156,6 @@ export const updateOne = (Model) =>
           new: true,
         },
       );
-    
 
     if (!document)
       return next(new AppError(`No ${Model.modelName} found.`, 404));

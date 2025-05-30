@@ -22,6 +22,7 @@ export default function Header({
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [signInData, setSignInData] = useState({ email: "", password: "" });
+  const [authChanged, setAuthChanged] = useState(false);
   const [signUpData, setSignUpData] = useState({
     name: "",
     email: "",
@@ -33,16 +34,16 @@ export default function Header({
   // geting user data if logged in
   useEffect(() => {
     (async () => {
-       axios
+      axios
         .get(`/api/users/me`, {
           withCredentials: true,
         })
         .then((res) => setUser(res.data.document))
         .catch(() => {
-           setUser(null);
+          setUser(null);
         });
     })();
-  }, [showSignInModal, showSignUpModal]);
+  }, [authChanged]);
 
   // ESC key to close modal
   useEffect(() => {
@@ -101,6 +102,7 @@ export default function Header({
       setAlertMessage(response.data.message);
       setAlertType("success");
       setUser(response.data.user);
+      setAuthChanged(prev => !prev)
       closeSignInModal();
       if (response.data.user.role === "admin") navigate("/admin");
     } catch (error) {
@@ -119,6 +121,7 @@ export default function Header({
       setAlertMessage(response.data.message);
       setAlertType("success");
       setUser(response.data.user);
+      setAuthChanged(prev => !prev)
       closeSignUpModal();
     } catch (error) {
       setAlertMessage(error.response?.data?.message || "An error occurred");

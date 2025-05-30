@@ -76,10 +76,6 @@ export default (err, req, res, next) => {
     sendMessageDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = new Object(err);
-    //another way to create copy or the error
-    // let error = { ...err };
-    // error.message = err.message;
-   
     if (error.name == 'jwt malformed') error = handleJwtMalformed(error);
     if (error.name == 'CastError') error = handleCastErrorDB(error);
     if (error.name == 'ValidationError') error = handleValidationErrorDB(error);

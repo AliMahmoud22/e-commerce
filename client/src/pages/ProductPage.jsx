@@ -56,7 +56,7 @@ export default function ProductPage() {
       setAlertType("success");
       setIsLoading(false);
     } catch (error) {
-      setAlertMessage(`Error happened ${error.response.data.message}`);
+      setAlertMessage(error.response.data.message);
       setAlertType("error");
     }
   };

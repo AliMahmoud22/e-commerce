@@ -99,6 +99,7 @@ userSchema.methods.createForgotPasswordToken = function () {
 //return if Password Changed after the time sent
 userSchema.methods.isPasswordChanged = function (tokenIAT) {
   if (this.passwordChangedAt) {
+    
     return this.passwordChangedAt.getTime() / 1000 > tokenIAT;
   }
   return false;

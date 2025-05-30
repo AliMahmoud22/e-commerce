@@ -110,6 +110,22 @@ productSchema.pre('save', function (next) {
   }
   next();
 });
+
+productSchema.pre('save', function (next) {
+  const meetsRatingCriteria =
+    this.ratingsAverage >= 9 && this.ratingsCount >= 10;
+  const hasGreatDiscount =
+    this.discount && (this.discount / this.price) * 100 > 30;
+
+  if (meetsRatingCriteria && hasGreatDiscount) {
+    this.isFeatured = true;
+  } else {
+    this.isFeatured = false;
+  }
+
+  next();
+});
+
 productSchema.pre(/^findOneAndUpdate|updateOne$/, async function (next) {
   const update = this.getUpdate();
   const { discount } = update;
@@ -130,6 +146,24 @@ productSchema.pre(/^findOneAndUpdate|updateOne$/, async function (next) {
       );
     }
   }
+
+  next();
+});
+productSchema.pre(/^findOneAndUpdate|updateOne$/, async function (next) {
+  const update = this.getUpdate();
+  const product = await this.model.findOne(this.getQuery());
+  if (!product) return next(new AppError('Product not found', 404));
+
+  // Use updated values if provided, else fallback to existing ones
+  const ratingsAverage = update.ratingsAverage ?? product.ratingsAverage;
+  const ratingsCount = update.ratingsCount ?? product.ratingsCount;
+  const price = update.price ?? product.price;
+  const discount = update.discount ?? product.discount;
+
+  const meetsRatingCriteria = ratingsAverage >= 9 && ratingsCount >= 10;
+  const hasGreatDiscount = discount && (discount / price) * 100 > 30;
+
+  update.isFeatured = meetsRatingCriteria && hasGreatDiscount;
 
   next();
 });
